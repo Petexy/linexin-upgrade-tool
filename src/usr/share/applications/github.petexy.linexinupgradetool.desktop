@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Linexin Upgrade Tool
+
+Exec=python /usr/share/linexin-upgrade-tool/upgrader
+
+Icon=/usr/share/linexin-upgrade-tool/images/github.petexy.linexinupgradetool.svg
+
+Terminal=false
+Type=Application
+Categories=GTK; Installer; System; Linexin; Adwaita
+StartupNotify=false

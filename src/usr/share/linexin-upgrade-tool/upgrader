@@ -22,7 +22,7 @@ gi.require_version("Adw", "1")
 from gi.repository import Gtk, Adw, GLib, Gdk
 
 # --- Localization Setup ---
-APP_NAME = "linexin-installer"
+APP_NAME = "linexin-upgrader"
 LOCALE_DIR = os.path.abspath("/usr/share/locale")
 
 # Set initial language (will default to system language if not specified)

@@ -1,0 +1,242 @@
+#!/usr/bin/env python3
+
+import gi
+import subprocess
+import threading
+import gettext
+import locale
+import os
+import sys
+import shutil
+
+from welcome_widget import WelcomeWidget
+from simple_localization_manager import get_localization_manager
+from news_widget import WhatsNewWidget
+from install_new_apps_widget import InstallDefaultsWidget
+from linexin_center_style_picker_widget import LinexinCenterStyleWidget
+from finish_widget import FinishWidget
+#from custom_widget import CustomWidget
+
+gi.require_version("Gtk", "4.0")
+gi.require_version("Adw", "1")
+from gi.repository import Gtk, Adw, GLib, Gdk
+
+# --- Localization Setup ---
+APP_NAME = "linexin-upgrader"
+LOCALE_DIR = os.path.abspath("/usr/share/locale")
+
+# Set initial language (will default to system language if not specified)
+locale.setlocale(locale.LC_ALL, '')
+locale.bindtextdomain(APP_NAME, LOCALE_DIR)
+gettext.textdomain(APP_NAME)
+_ = gettext.gettext
+
+class MainWindow(Adw.ApplicationWindow):
+    def __init__(self, app):
+
+        config_dir = "/tmp/installer_config"
+        if os.path.exists(config_dir):
+            import shutil
+            shutil.rmtree(config_dir)  
+
+
+        super().__init__(application=app)
+        self.set_title("")
+        self.set_default_size(1100, 850)
+        self.progress_visible = False
+        self.install_started = False
+        self.progress_data = ""
+        self.error_message = None
+        self.caro = 4
+
+        # Connect the close request signal
+        self.connect("close-request", self.on_close_request)
+
+        # --- Main Layout Changes ---
+        top_level_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.set_content(top_level_box)
+
+        self.header_bar = Adw.HeaderBar()
+        self.header_bar.set_title_widget(Adw.WindowTitle.new(self.get_title(), ""))
+        top_level_box.append(self.header_bar)
+        css_provider = Gtk.CssProvider()
+        css = """
+        headerbar {
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+        }
+        .titlebar {
+            background-color: transparent;
+        }
+        .proceed_button {
+            font-size: 16px;
+            min-width: 300px;
+            min-height: 40px; 
+        }
+        .welcome_text {
+            font-size: 40px;
+        }
+        .buttons_all {
+            font-size: 14px;
+            min-width: 150px;
+            min-height: 40px;
+        }
+        """
+        css_provider.load_from_data(css.encode())
+        Gtk.StyleContext.add_provider_for_display(
+            Gdk.Display.get_default(),
+            css_provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
+        
+        #Initialize all widgets - INCLUDE YOUR MAIN FUNCTION HERE
+        self.welcome_page = WelcomeWidget()
+        self.news_page = WhatsNewWidget()
+        self.apps_page = InstallDefaultsWidget()
+        self.linexin_center_page = LinexinCenterStyleWidget()
+        self.finish_page = FinishWidget()
+        #self.custom_page = CustomWidget()
+        
+        ######################
+        # HEADERBAR ADDITIONS
+
+        ###################
+
+        # --- Main Gtk.Stack to switch between app sections ---
+        self.main_stack = Gtk.Stack()
+        self.main_stack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
+        self.main_stack.set_vexpand(True)
+        top_level_box.append(self.main_stack)
+
+        # --- Instantiate all your pages --- ADD SHORT NAME FOR STACK TO BE PRESENT
+
+        self.main_stack.add_named(self.welcome_page, "welcome")
+        self.main_stack.add_named(self.news_page, "news")
+        self.main_stack.add_named(self.apps_page, "apps")
+        self.main_stack.add_named(self.linexin_center_page, "linexin-center")
+        self.main_stack.add_named(self.finish_page, "finish")
+        #self.main_stack.add_named(self.custom_page, "shortname_custom")
+
+        # --- Localization --- NEED TO ADD YOUR SHORT NAME HERE IF YOU WANT TO LOCALIZE IT
+
+        localization_manager = get_localization_manager()
+        for page_name in ["welcome", "news", "apps", "linexin-center", "finish"]: ### Add your custom widget's short name
+            page = self.main_stack.get_child_by_name(page_name)
+            if page:
+                localization_manager.register_widget(page)
+
+        # Also register the main window for header bar elements
+        localization_manager.register_widget(self)      
+
+        # --- Connect signals ---
+        self.welcome_page.btn_install.connect("clicked", self.on_begin_clicked)
+        self.news_page.btn_continue.connect("clicked", self.on_news_continue_clicked)
+        self.apps_page.back_btn.connect("clicked", self.on_apps_back_clicked)
+        self.apps_page.continue_btn.connect("clicked", self.on_apps_continue_clicked)
+        self.linexin_center_page.back_btn.connect("clicked", self.on_linexin_center_back_clicked)
+        self.linexin_center_page.continue_btn.connect("clicked", self.on_linexin_center_continue_clicked)
+        self.finish_page.btn_back.connect("clicked", self.on_back_from_finish_clicked)
+
+
+        #self.custom_page.btn_proceed.connect("clicked", self.on_custom_widget_continue_clicked)  ### Connecting custom widget's Continue button to work
+        #self.custom_page.btn_back.connect("clicked, self.on_back_btn_on_custom_widget_clicked") ### Connecting custom widget's Back button to work
+
+
+    #def on_custom_widget_continue_clicked(self, button):
+    #    self.main_stack.set_visible_child_name("installation") ### MAKE SURE TO CHANGE installation TO YOUR DESIRED STACK
+
+    #def on_back_btn_on_custom_widget_clicked(self, command):
+    #    self.main_stack.set_visible_child_name("welcome")  ### MAKE SURE TO CHANGE welcome TO YOUR DESIRED STACK
+
+
+    def hide_desktop_files(self):
+        """Hide multiple desktop files by setting Hidden=true in a single run0 call"""
+        
+        # Build bash script to process all files at once
+        bash_script = """
+        for file in github.petexy.linexinupdater.desktop github.petexy.linexin-desktop-presets.desktop github.petexy.affinityinstaller.desktop github.petexy.davinciinstaller.desktop; do
+            filepath="/usr/share/applications/$file"
+            if [ -f "$filepath" ]; then
+                if grep -q "^Hidden=" "$filepath"; then
+                    sed -i 's/^Hidden=.*/Hidden=false/' "$filepath"
+                    echo "Updated Hidden=false in $file"
+                else
+                    echo "Hidden=false" >> "$filepath"
+                    echo "Added Hidden=false to $file"
+                fi
+            else
+                echo "File not found: $file"
+            fi
+        done
+        """
+        
+        subprocess.run(['run0', 'bash', '-c', bash_script], 
+                            check=True, capture_output=True, text=True)
+        return True
+
+
+    def get_app_directory(self):
+        """Get the directory where the installer script is located"""
+        return os.path.dirname(os.path.abspath(__file__))
+
+    #def on_back_btn_clicked(self, command):
+    #    self.main_stack.set_visible_child_name("welcome")
+
+
+
+    def on_begin_clicked(self, button):
+        self.main_stack.set_visible_child_name("news")
+
+
+
+    def on_news_continue_clicked(self, button):
+        self.main_stack.set_visible_child_name("apps")
+        
+
+
+    def on_apps_back_clicked(self, button):
+        self.main_stack.set_visible_child_name("news")
+
+    def on_apps_continue_clicked(self, button):
+        self.main_stack.set_visible_child_name("linexin-center")
+
+
+
+
+    def on_linexin_center_back_clicked(self, button):
+        self.main_stack.set_visible_child_name("apps")
+
+    def on_linexin_center_continue_clicked(self, button):
+        if self.linexin_center_page.selected_option == 1:
+            self.hide_desktop_files()
+        else:
+            pass
+        self.main_stack.set_visible_child_name("finish")        
+
+    def on_back_from_finish_clicked(self, button):
+        self.main_stack.set_visible_child_name("linexin-center")
+
+
+    #def on_apps_continue_clicked(self, button):
+    #    self.main_stack.set_visible_child_name("linexin-center")
+
+
+
+
+    def on_close_request(self, window):
+        """Handle application close request - unmount directories before closing"""
+        print("Application is closing, attempting to unmount directories...")
+
+
+class Installer(Adw.Application):
+    def __init__(self):
+        super().__init__(application_id="github.petexy.linexinupgradetool")
+
+    def do_activate(self):
+        win = MainWindow(self)
+        win.present()
+
+if __name__ == "__main__":
+    app = Installer()
+    sys.exit(app.run(sys.argv))

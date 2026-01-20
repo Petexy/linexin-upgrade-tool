@@ -12,7 +12,7 @@ import shutil
 from welcome_widget import WelcomeWidget
 from simple_localization_manager import get_localization_manager
 from news_widget import WhatsNewWidget
-from install_new_apps_widget import InstallDefaultsWidget
+from de_selection_widget import DEPicker
 from linexin_center_style_picker_widget import LinexinCenterStyleWidget
 from finish_widget import FinishWidget
 #from custom_widget import CustomWidget
@@ -21,15 +21,10 @@ gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 from gi.repository import Gtk, Adw, GLib, Gdk
 
+from simple_localization_manager import get_localization_manager, _
+
 # --- Localization Setup ---
 APP_NAME = "linexin-upgrader"
-LOCALE_DIR = os.path.abspath("/usr/share/locale")
-
-# Set initial language (will default to system language if not specified)
-locale.setlocale(locale.LC_ALL, '')
-locale.bindtextdomain(APP_NAME, LOCALE_DIR)
-gettext.textdomain(APP_NAME)
-_ = gettext.gettext
 
 class MainWindow(Adw.ApplicationWindow):
     def __init__(self, app):
@@ -39,15 +34,18 @@ class MainWindow(Adw.ApplicationWindow):
             import shutil
             shutil.rmtree(config_dir)  
 
-
         super().__init__(application=app)
         self.set_title("")
-        self.set_default_size(1100, 850)
+        self.set_default_size(800, 600)
         self.progress_visible = False
         self.install_started = False
         self.progress_data = ""
         self.error_message = None
+        self.progress_data = ""
+        self.error_message = None
         self.caro = 4
+        self.is_installing = False # Flag to track active installation
+        self.force_close = False # Flag to allow closing programmatically (e.g. reboot)
 
         # Connect the close request signal
         self.connect("close-request", self.on_close_request)
@@ -58,6 +56,10 @@ class MainWindow(Adw.ApplicationWindow):
 
         self.header_bar = Adw.HeaderBar()
         self.header_bar.set_title_widget(Adw.WindowTitle.new(self.get_title(), ""))
+        # Disable window controls as requested (Kiosk-like mode)
+        self.header_bar.set_show_end_title_buttons(False)
+        self.header_bar.set_show_start_title_buttons(False)
+        
         top_level_box.append(self.header_bar)
         css_provider = Gtk.CssProvider()
         css = """
@@ -90,38 +92,34 @@ class MainWindow(Adw.ApplicationWindow):
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
         
-        #Initialize all widgets - INCLUDE YOUR MAIN FUNCTION HERE
+        
+        #Initialize all widgets
         self.welcome_page = WelcomeWidget()
         self.news_page = WhatsNewWidget()
-        self.apps_page = InstallDefaultsWidget()
+        self.apps_page = DEPicker()
         self.linexin_center_page = LinexinCenterStyleWidget()
         self.finish_page = FinishWidget()
         #self.custom_page = CustomWidget()
         
-        ######################
-        # HEADERBAR ADDITIONS
-
-        ###################
-
         # --- Main Gtk.Stack to switch between app sections ---
         self.main_stack = Gtk.Stack()
         self.main_stack.set_transition_type(Gtk.StackTransitionType.SLIDE_LEFT_RIGHT)
         self.main_stack.set_vexpand(True)
+        self.main_stack.set_hexpand(True)
+        self.main_stack.set_halign(Gtk.Align.FILL)
+        self.main_stack.set_valign(Gtk.Align.FILL)
         top_level_box.append(self.main_stack)
 
-        # --- Instantiate all your pages --- ADD SHORT NAME FOR STACK TO BE PRESENT
-
+        # --- Instantiate all your pages --- 
         self.main_stack.add_named(self.welcome_page, "welcome")
         self.main_stack.add_named(self.news_page, "news")
         self.main_stack.add_named(self.apps_page, "apps")
-        self.main_stack.add_named(self.linexin_center_page, "linexin-center")
         self.main_stack.add_named(self.finish_page, "finish")
         #self.main_stack.add_named(self.custom_page, "shortname_custom")
 
-        # --- Localization --- NEED TO ADD YOUR SHORT NAME HERE IF YOU WANT TO LOCALIZE IT
-
+        # --- Localization ---
         localization_manager = get_localization_manager()
-        for page_name in ["welcome", "news", "apps", "linexin-center", "finish"]: ### Add your custom widget's short name
+        for page_name in ["welcome", "news", "apps", "finish"]: 
             page = self.main_stack.get_child_by_name(page_name)
             if page:
                 localization_manager.register_widget(page)
@@ -133,101 +131,499 @@ class MainWindow(Adw.ApplicationWindow):
         self.welcome_page.btn_install.connect("clicked", self.on_begin_clicked)
         self.news_page.btn_continue.connect("clicked", self.on_news_continue_clicked)
         self.apps_page.back_btn.connect("clicked", self.on_apps_back_clicked)
-        self.apps_page.continue_btn.connect("clicked", self.on_apps_continue_clicked)
-        self.linexin_center_page.back_btn.connect("clicked", self.on_linexin_center_back_clicked)
-        self.linexin_center_page.continue_btn.connect("clicked", self.on_linexin_center_continue_clicked)
+        # Connect signals - NOTE: apps_page continue logic is now handled via callback
+        self.welcome_page.btn_install.connect("clicked", self.on_begin_clicked)
+        self.news_page.btn_continue.connect("clicked", self.on_news_continue_clicked)
+        self.apps_page.back_btn.connect("clicked", self.on_apps_back_clicked)
+        # self.apps_page.continue_btn.connect("clicked", self.on_apps_continue_clicked) <-- REMOVED
+        
+        # Determine strict callback hook
+        self.apps_page.on_continue_callback = self.on_apps_continue_clicked
+        
         self.finish_page.btn_back.connect("clicked", self.on_back_from_finish_clicked)
-
-
-        #self.custom_page.btn_proceed.connect("clicked", self.on_custom_widget_continue_clicked)  ### Connecting custom widget's Continue button to work
-        #self.custom_page.btn_back.connect("clicked, self.on_back_btn_on_custom_widget_clicked") ### Connecting custom widget's Back button to work
-
-
-    #def on_custom_widget_continue_clicked(self, button):
-    #    self.main_stack.set_visible_child_name("installation") ### MAKE SURE TO CHANGE installation TO YOUR DESIRED STACK
-
-    #def on_back_btn_on_custom_widget_clicked(self, command):
-    #    self.main_stack.set_visible_child_name("welcome")  ### MAKE SURE TO CHANGE welcome TO YOUR DESIRED STACK
-
-
-    def hide_desktop_files(self):
-        """Hide multiple desktop files by setting Hidden=true in a single run0 call"""
         
-        # Build bash script to process all files at once
-        bash_script = """
-        for file in github.petexy.linexinupdater.desktop github.petexy.linexin-desktop-presets.desktop github.petexy.affinityinstaller.desktop github.petexy.davinciinstaller.desktop; do
-            filepath="/usr/share/applications/$file"
-            if [ -f "$filepath" ]; then
-                if grep -q "^Hidden=" "$filepath"; then
-                    sed -i 's/^Hidden=.*/Hidden=false/' "$filepath"
-                    echo "Updated Hidden=false in $file"
-                else
-                    echo "Hidden=false" >> "$filepath"
-                    echo "Added Hidden=false to $file"
-                fi
-            else
-                echo "File not found: $file"
-            fi
-        done
+        # --- Handle Page Switching & Header Bar Logic ---
+        self.main_stack.connect("notify::visible-child", self._on_page_changed)
+        # Initial state check
+        self._on_page_changed(self.main_stack, None)
+
+    def _on_page_changed(self, stack, param):
+        """Updates window controls based on current page."""
+        name = stack.get_visible_child_name()
+        self._update_header_bar(name)
+
+    def _update_header_bar(self, page_name):
         """
-        
-        subprocess.run(['run0', 'bash', '-c', bash_script], 
-                            check=True, capture_output=True, text=True)
-        return True
+        Show window controls only on 'welcome' and 'news'.
+        Hide them on 'apps', 'finish' or others.
+        """
+        if page_name in ["welcome", "news"]:
+            self.header_bar.set_show_end_title_buttons(True)
+            self.header_bar.set_show_start_title_buttons(True) # Optional, usually just end buttons needed
+        else:
+            self.header_bar.set_show_end_title_buttons(False)
+            self.header_bar.set_show_start_title_buttons(False)
 
+        # Variable to store the user's choice regarding GNOME removal
+        self.remove_gnome_flag = False
+        self.installing_kinexin = False # Track which DE is being installed
+
+    def on_begin_clicked(self, button):
+        self.main_stack.set_visible_child_name("news")
+
+    def on_news_continue_clicked(self, button):
+        self.main_stack.set_visible_child_name("apps")
+
+    def on_apps_back_clicked(self, button):
+        self.main_stack.set_visible_child_name("news")
+
+    def on_apps_continue_clicked(self, index, option, password=None):
+        """
+        Handle the continue button click on the Apps/DE Picker page.
+        Received via callback from DEPicker.
+        """
+        if index == 1:
+            # Option 1: Kinexin Desktop -> Trigger confirmation flow
+            self.installing_kinexin = True
+            self.confirm_installation(password)
+        elif index == 0:
+            # Option 0: Linexin -> Install directly (no conflict check)
+            self.installing_kinexin = False
+            if password:
+                self._start_linexin_installation(password)
+            else:
+                self.main_stack.set_visible_child_name("finish")
+        else:
+            # Other logical paths
+            self.installing_kinexin = False
+            self.finish_page.set_requires_restart(False)
+            self.main_stack.set_visible_child_name("finish")
+
+    def confirm_installation(self, password):
+        """
+        Displays a warning dialog with 3 choices: Cancel, Keep GNOME, Remove GNOME.
+        """
+        # Store password temporarily for the dialog response
+        self._temp_password = password
+        
+        # Create the warning dialog
+        dialog = Adw.MessageDialog(
+            transient_for=self,
+            heading=_("Installation Conflict Warning"),
+            body=_("Installing Kinexin Desktop alongside your current desktop (GNOME) may cause configuration conflicts.\n\n"
+                   "You can choose to remove GNOME completely to ensure the best experience, or keep both installed side-by-side.")
+        )
+
+        # Add the three responses
+        dialog.add_response("cancel", _("Cancel"))
+        dialog.add_response("keep_gnome", _("Install Side-by-Side"))
+        dialog.add_response("remove_gnome", _("Remove GNOME & Install"))
+        
+        # Style the remove button as destructive to warn the user
+        dialog.set_response_appearance("remove_gnome", Adw.ResponseAppearance.DESTRUCTIVE)
+        
+        # Style the keep button as suggested/default if preferred, or leave neutral
+        #dialog.set_response_appearance("keep_gnome", Adw.ResponseAppearance.SUGGESTED)
+
+        dialog.connect("response", self._on_confirm_response)
+        dialog.present()
+
+    def _on_confirm_response(self, dialog, response):
+        """Handle the user's choice from the confirmation dialog."""
+        password = getattr(self, '_temp_password', None)
+        
+        if response == "remove_gnome":
+            self.remove_gnome_flag = True
+            if password:
+                self._start_installation_with_password(password)
+            else:
+                self._prompt_for_password()
+        elif response == "keep_gnome":
+            self.remove_gnome_flag = False
+            if password:
+                self._start_installation_with_password(password)
+            else:
+                self._prompt_for_password()
+        else:
+            # Cancelled or closed
+            self.main_stack.set_visible_child_name("apps")
+            
+    def _start_installation_with_password(self, password):
+        """Starts installation immediately with provided password"""
+        self.is_installing = True
+        # 1. Show the Progress Dialog immediately
+        self._create_progress_dialog()
+        
+        # 2. Start the installation in a separate thread
+        thread = threading.Thread(target=self._execute_installation_logic, args=(password, self.remove_gnome_flag))
+        thread.daemon = True
+        thread.start()
+
+    def _prompt_for_password(self):
+        """Creates a dialog to ask for sudo password."""
+        pass_dialog = Adw.MessageDialog(
+            transient_for=self,
+            heading=_("Authentication Required"),
+            body=_("Please enter your password to modify system packages.")
+        )
+        
+        # Create a password entry box
+        self.password_entry = Gtk.PasswordEntry()
+        self.password_entry.set_hexpand(True)
+        
+        # FIX: Manual activation signal to avoid the set_activates_default error
+        self.password_entry.connect("activate", lambda entry: pass_dialog.response("install"))
+        
+        pass_dialog.set_extra_child(self.password_entry)
+        
+        pass_dialog.add_response("cancel", _("Cancel"))
+        pass_dialog.add_response("install", _("Install"))
+        pass_dialog.set_default_response("install")
+        
+        pass_dialog.connect("response", self._on_password_entered)
+        pass_dialog.present()
+
+    def _validate_password(self, password):
+        """Verify password using sudo -v"""
+        try:
+            cmd = f"echo '{password}' | sudo -S -v -k"
+            subprocess.run(cmd, shell=True, check=True, stderr=subprocess.PIPE)
+            return True
+        except subprocess.CalledProcessError:
+            return False
+
+    def _on_password_entered(self, dialog, response):
+        """Handle password submission."""
+        # Capture password first
+        password = self.password_entry.get_text()
+        
+        # Explicitly close the password dialog immediately
+        dialog.close()
+
+        if response == "install":
+            if password:
+                # Validate password first
+                if self._validate_password(password):
+                    # 1. Show the Progress Dialog immediately
+                    self._create_progress_dialog()
+                    
+                    # 2. Start the installation in a separate thread
+                    # We pass the remove_gnome_flag to the thread logic
+                    thread = threading.Thread(target=self._execute_installation_logic, args=(password, self.remove_gnome_flag))
+                    thread.daemon = True
+                    thread.start()
+                else:
+                    # Show error dialog
+                    err_dialog = Adw.MessageDialog(
+                        transient_for=self,
+                        heading=_("Authentication Failed"),
+                        body=_("Incorrect password. Please try again.")
+                    )
+                    err_dialog.add_response("ok", _("OK"))
+                    err_dialog.present()
+            else:
+                # Password empty, return to apps
+                self.main_stack.set_visible_child_name("apps")
+        else:
+            # User cancelled password prompt, return to apps
+            self.main_stack.set_visible_child_name("apps")
+
+        # NOTE: No buttons initially to prevent closing during install
+        self.progress_dialog.present()
+
+    def _start_linexin_installation(self, password):
+        """Start Linexin installation immediately"""
+        self.is_installing = True
+        # 1. Show the Progress Dialog (using Linexin title)
+        self._create_progress_dialog(is_kinexin=False)
+        
+        # 2. Start the installation in a separate thread
+        thread = threading.Thread(target=self._execute_linexin_logic, args=(password,))
+        thread.daemon = True
+        thread.start()
+
+    def _create_progress_dialog(self, is_kinexin=True):
+        """
+        Creates a modal dialog with a spinner to show installation progress.
+        """
+        title = _("Installing Kinexin Desktop") if is_kinexin else _("Installing Linexin Desktop")
+        
+        self.progress_dialog = Adw.MessageDialog(
+            transient_for=self,
+            heading=title,
+            body=_("Please wait while the system is being updated.\nThis may take several minutes.")
+        )
+        
+        # Create a box to hold the spinner and a status label
+        content_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        content_box.set_halign(Gtk.Align.CENTER)
+        
+        # Add Spinner
+        self.spinner = Gtk.Spinner()
+        self.spinner.set_size_request(32, 32)
+        self.spinner.start()
+        content_box.append(self.spinner)
+        
+        # Add Status Label (to update text like "Running pacman...")
+        self.status_label = Gtk.Label(label=_("Initializing..."))
+        content_box.append(self.status_label)
+        
+        self.progress_dialog.set_extra_child(content_box)
+        
+        # NOTE: No buttons initially to prevent closing during install
+        self.progress_dialog.present()
+
+    def _update_progress_status(self, message):
+        """Helper to update status label from main thread."""
+        if hasattr(self, 'status_label'):
+            self.status_label.set_label(message)
+
+    def _on_installation_success(self, password=None):
+        """Called when installation finishes successfully."""
+        self.is_installing = False
+        # Close the progress dialog
+        if hasattr(self, 'progress_dialog'):
+            self.progress_dialog.close()
+        
+        # Set the reboot flag for both Linexin and Kinexin installations
+        self.finish_page.set_requires_restart(True)
+        # Pass password to finish page for reboot
+        if password:
+            self.finish_page.set_sudo_password(password)
+        
+        # Switch to the finish page
+        self.main_stack.set_visible_child_name("finish")
+
+    def _on_installation_error(self, error_message):
+        """Called if installation fails."""
+        self.is_installing = False
+        # Stop spinner
+        if hasattr(self, 'spinner'):
+            self.spinner.stop()
+        
+        # Update text to show error
+        if hasattr(self, 'status_label'):
+            self.status_label.set_label(f"Error: {error_message}")
+            
+        # Add a Close button so user can dismiss the failed dialog
+        if hasattr(self, 'progress_dialog'):
+            self.progress_dialog.set_heading(_("Installation Failed"))
+            self.progress_dialog.set_body(_("An error occurred during installation."))
+            self.progress_dialog.add_response("close", _("Close"))
+
+    def _execute_linexin_logic(self, password):
+        """
+        Executes the Linexin Desktop installation commands.
+        """
+        try:
+            GLib.idle_add(self._update_progress_status, _("Installing Linexin Desktop..."))
+            print("Running pacman for Linexin...")
+            
+            # Install linexin-desktop with overwrite
+            pacman_cmd = f"echo '{password}' | sudo -S pacman -Sy linexin-desktop --noconfirm --overwrite '*'"
+            subprocess.run(pacman_cmd, shell=True, check=True, text=True)
+            
+            # Update OS Release and Version files
+            self._update_os_version_files(password)
+            
+            # Hide desktop entry
+            self._hide_desktop_entry(password)
+
+            print("Linexin installation completed successfully.")
+            GLib.idle_add(self._on_installation_success, password)
+            
+        except subprocess.CalledProcessError as e:
+            print(f"An error occurred during Linexin installation: {e}")
+            GLib.idle_add(self._on_installation_error, f"Command failed: {e}")
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            GLib.idle_add(self._on_installation_error, str(e))
+        finally:
+            try:
+                subprocess.run("sudo -k", shell=True)
+            except:
+                pass
+
+    def _execute_installation_logic(self, password, remove_gnome):
+        """
+        Executes the installation commands.
+        Updates UI via GLib.idle_add.
+        """
+        import stat
+        
+        wrapper_path = "/tmp/kinexin_sudo_wrapper.sh"
+        
+        try:
+            # Update UI
+            GLib.idle_add(self._update_progress_status, _("Creating permissions wrapper..."))
+            
+            # 1. Create the sudo wrapper
+            with open(wrapper_path, "w") as f:
+                f.write("#!/bin/bash\n")
+                f.write(f"echo '{password}' | sudo -S \"$@\"")
+            
+            st = os.stat(wrapper_path)
+            os.chmod(wrapper_path, st.st_mode | stat.S_IEXEC)
+
+            # 3. Run Pacman for Kinexin (and Linexin if side-by-side)
+            GLib.idle_add(self._update_progress_status, _("Installing Desktop Environment..."))
+            print("Running pacman for Kinexin...")
+            
+            pkgs = "kinexin-desktop"
+            if not remove_gnome:
+                # User requested both for side-by-side
+                pkgs += " linexin-desktop"
+
+            pacman_cmd = f"echo '{password}' | sudo -S pacman -Sy {pkgs} --noconfirm --overwrite '*'"
+            subprocess.run(pacman_cmd, shell=True, check=True, text=True)
+
+            # 4. Run Paru for Effects
+            GLib.idle_add(self._update_progress_status, _("Installing Window Effects..."))
+            print("Running paru...")
+            
+            paru_cmd = [
+                "paru", "-S", "--overwrite", "*", "--rebuild", "--noconfirm",
+                "--sudo", wrapper_path, 
+                "kwin-effect-rounded-corners-git", "kwin-effects-glass-git"
+            ]
+            
+            subprocess.run(paru_cmd, check=True, text=True)
+
+            # 2. (Optional) Remove GNOME
+            if remove_gnome:
+                GLib.idle_add(self._update_progress_status, _("Removing GNOME Desktop..."))
+                print("Removing GNOME...")
+                # Using -Rsc to remove gnome recursively and clean deps
+                # WARNING: This is aggressive, but requested by user
+                remove_cmd = f"echo '{password}' | sudo -S pacman -Rsc gnome --noconfirm"
+                subprocess.run(remove_cmd, shell=True, check=True, text=True)
+            
+            # 5. Cleanup
+            if os.path.exists(wrapper_path):
+                os.remove(wrapper_path)
+
+            # 6. Update OS Release and Version files (User Request)
+            self._update_os_version_files(password)
+            
+            # Hide desktop entry
+            self._hide_desktop_entry(password)
+
+            print("Installation commands completed successfully.")
+            
+            # Success! Transition to finish page on the main thread
+            GLib.idle_add(self._on_installation_success, password)
+            
+        except subprocess.CalledProcessError as e:
+            print(f"An error occurred during installation: {e}")
+            if os.path.exists(wrapper_path):
+                os.remove(wrapper_path)
+            # Show error on UI
+            GLib.idle_add(self._on_installation_error, f"Command failed: {e}")
+            
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            if os.path.exists(wrapper_path):
+                os.remove(wrapper_path)
+            # Show error on UI
+            GLib.idle_add(self._on_installation_error, str(e))
+        finally:
+            # Always clear sudo cache
+            try:
+                subprocess.run("sudo -k", shell=True)
+            except:
+                pass
+
+    def _update_os_version_files(self, password):
+        """
+        Updates the os-release and version files as requested.
+        1. copy /usr/share/linexin-upgrade-tool/os-release -> /usr/lib/os-release
+        2. link /usr/lib/os-release -> /etc/os-release
+        3. copy /usr/share/linexin-upgrade-tool/version -> /version
+        """
+        try:
+            GLib.idle_add(self._update_progress_status, _("Updating system version info..."))
+            print("Updating OS release and version files...")
+            
+            # Source paths
+            src_os_release = "/usr/share/linexin-upgrade-tool/os-release"
+            src_version = "/usr/share/linexin-upgrade-tool/version"
+            
+            # Destination paths
+            dest_os_release_lib = "/usr/lib/os-release"
+            dest_os_release_etc = "/etc/os-release"
+            dest_version = "/version"
+
+            # 1. Copy os-release to /usr/lib
+            cmd_copy_os = f"echo '{password}' | sudo -S cp '{src_os_release}' '{dest_os_release_lib}'"
+            subprocess.run(cmd_copy_os, shell=True, check=True)
+            
+            # 2. Link /usr/lib/os-release to /etc/os-release (force relink)
+            cmd_link = f"echo '{password}' | sudo -S ln -sf '{dest_os_release_lib}' '{dest_os_release_etc}'"
+            subprocess.run(cmd_link, shell=True, check=True)
+            
+            # 3. Copy version to /version
+            cmd_copy_ver = f"echo '{password}' | sudo -S cp '{src_version}' '{dest_version}'"
+            subprocess.run(cmd_copy_ver, shell=True, check=True)
+            
+            print("OS files updated successfully.")
+            
+        except subprocess.CalledProcessError as e:
+            print(f"Warning: Failed to update OS files: {e}")
+            # We log but might not want to fail the whole install for this? 
+            # Proceeding as it is a post-install step.
+
+    def _hide_desktop_entry(self, password):
+        """
+        Hides the desktop entry so it's not visible in menus.
+        Target: /usr/share/applications/github.petexy.linexinupgradetool.desktop
+        Action: Set Hidden=true
+        """
+        try:
+            GLib.idle_add(self._update_progress_status, _("Finalizing..."))
+            print("Hiding desktop entry...")
+            desktop_file = "/usr/share/applications/github.petexy.linexinupgradetool.desktop"
+            # Use sed to replace Hidden=false with Hidden=true
+            cmd = f"echo '{password}' | sudo -S sed -i 's/Hidden=false/Hidden=true/' '{desktop_file}'"
+            subprocess.run(cmd, shell=True, check=True)
+        except Exception as e:
+            print(f"Warning: Failed to hide desktop entry: {e}")
 
     def get_app_directory(self):
         """Get the directory where the installer script is located"""
         return os.path.dirname(os.path.abspath(__file__))
 
-    #def on_back_btn_clicked(self, command):
-    #    self.main_stack.set_visible_child_name("welcome")
-
-
-
-    def on_begin_clicked(self, button):
-        self.main_stack.set_visible_child_name("news")
-
-
-
-    def on_news_continue_clicked(self, button):
-        self.main_stack.set_visible_child_name("apps")
-        
-
-
-    def on_apps_back_clicked(self, button):
-        self.main_stack.set_visible_child_name("news")
-
-    def on_apps_continue_clicked(self, button):
-        self.main_stack.set_visible_child_name("linexin-center")
-
-
-
-
-    def on_linexin_center_back_clicked(self, button):
-        self.main_stack.set_visible_child_name("apps")
-
-    def on_linexin_center_continue_clicked(self, button):
-        if self.linexin_center_page.selected_option == 1:
-            self.hide_desktop_files()
-        else:
-            pass
-        self.main_stack.set_visible_child_name("finish")        
-
     def on_back_from_finish_clicked(self, button):
-        self.main_stack.set_visible_child_name("linexin-center")
-
-
-    #def on_apps_continue_clicked(self, button):
-    #    self.main_stack.set_visible_child_name("linexin-center")
-
-
-
+        self.main_stack.set_visible_child_name("apps")
 
     def on_close_request(self, window):
-        """Handle application close request - unmount directories before closing"""
-        print("Application is closing, attempting to unmount directories...")
-
+        """
+        Handle application close request.
+        - Allow close on 'welcome', 'news'.
+        - Prevent close on others (enforcing kiosk-like flow).
+        - Prevent close if installing.
+        """
+        if self.force_close:
+            return False # Allow closing immediately
+            
+        if self.is_installing:
+            dialog = Adw.MessageDialog(
+                transient_for=self,
+                heading=_("Installation in Progress"),
+                body=_("The installation process is currently running. Please wait for it to complete.")
+            )
+            dialog.add_response("ok", _("OK"))
+            dialog.present()
+            return True # Prevent closing
+            
+        current_page = self.main_stack.get_visible_child_name()
+        if current_page in ["welcome", "news"]:
+             # Allow closing
+             print("Application closing from allowed page.")
+             return False 
+        
+        # Block closing on other pages
+        print(f"Close request ignored on page: {current_page}")
+        return True # Prevent closing
 
 class Installer(Adw.Application):
     def __init__(self):

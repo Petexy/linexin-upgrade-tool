@@ -1,7 +1,7 @@
 # Maintainer: Petexy <https://github.com/Petexy>
 
 pkgname=linexin-upgrade-tool
-pkgver=1.0.1.r
+pkgver=2.0.0.r
 pkgrel=1
 _currentdate=$(date +"%Y-%m-%d%H-%M-%S")
 pkgdesc='Linexin Operating System Upgrader'
@@ -17,6 +17,7 @@ depends=(
 )
 makedepends=(
 )
+install="${pkgname}.install"
 
 package() {
    mkdir -p ${pkgdir}/usr/share/linexin-upgrade-tool

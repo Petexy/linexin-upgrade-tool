@@ -11,14 +11,7 @@ gi.require_version("Adw", "1")
 
 from gi.repository import Gtk, Adw, Gdk, GLib
 
-# --- i18n Setup ---
-WIDGET_NAME = "linexin-installer-defaults-widget"
-LOCALE_DIR = "/usr/share/locale"
-locale.setlocale(locale.LC_ALL, '')
-locale.bindtextdomain(WIDGET_NAME, LOCALE_DIR)
-gettext.bindtextdomain(WIDGET_NAME, LOCALE_DIR)
-gettext.textdomain(WIDGET_NAME)
-_ = gettext.gettext
+from simple_localization_manager import get_localization_manager, _
 
 
 class LinexinCenterStyleWidget(Gtk.Box):
@@ -33,6 +26,9 @@ class LinexinCenterStyleWidget(Gtk.Box):
         """
         super().__init__(**kwargs)
         
+        # Auto-register for translation updates
+        get_localization_manager().register_widget(self)
+        
         print("DEBUG: Starting two box selection widget")
         
         # Store callback
@@ -42,11 +38,11 @@ class LinexinCenterStyleWidget(Gtk.Box):
         
         # Basic widget setup
         self.set_orientation(Gtk.Orientation.VERTICAL)
-        self.set_spacing(30)
-        self.set_margin_top(40)
-        self.set_margin_bottom(40)
-        self.set_margin_start(60)
-        self.set_margin_end(60)
+        self.set_spacing(10)
+        self.set_margin_top(30)
+        self.set_margin_bottom(30) # Standardized
+        self.set_margin_start(20)
+        self.set_margin_end(20)
         
         # Setup CSS first
         self.setup_css()
@@ -64,14 +60,14 @@ class LinexinCenterStyleWidget(Gtk.Box):
         # Define the two options
         self.options = [
             {
-                "name": "New Linexin Center (Recommended)",
-                "description": "Unify your Linexin apps inside one simple app.",
+                "name": _("New Linexin Center (Recommended)"),
+                "description": _("Unify your Linexin apps inside one simple app."),
                 "icon": "screen1.png",
                 #"details": "Includes gaming launchers, performance tools, and game compatibility layers"
             },
             {
-                "name": "Separate Apps Icons",
-                "description": "Keep my apps as separate icons.",
+                "name": _("Separate Apps Icons"),
+                "description": _("Keep my apps as separate icons."),
                 "icon": "screen2.png", 
                 #"details": "Office suite, development tools, media editing, and system utilities"
             }
@@ -97,27 +93,25 @@ class LinexinCenterStyleWidget(Gtk.Box):
         
         navigation_btns = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
         navigation_btns.set_halign(Gtk.Align.CENTER)
-        navigation_btns.set_margin_top(142)
+        navigation_btns.set_margin_top(30)  # Standardized to 30
 
         # Continue button
         self.continue_btn = Gtk.Button()
-        self.continue_btn.set_label("Continue")
+        self.continue_btn.set_label(_("Continue"))
         self.continue_btn.add_css_class("suggested-action")
         self.continue_btn.add_css_class("continue_button")
         self.continue_btn.set_size_request(200, 50)
         self.continue_btn.set_halign(Gtk.Align.CENTER)
         self.continue_btn.set_margin_end(10)
-        self.continue_btn.set_margin_top(20)
         self.continue_btn.connect("clicked", self.on_continue_clicked)
         
 
         self.back_btn = Gtk.Button()
-        self.back_btn.set_label("Back")
+        self.back_btn.set_label(_("Back"))
         #self.back_btn.add_css_class("suggested-action")
         self.back_btn.add_css_class("back_button")
         self.back_btn.set_size_request(200, 50)
         self.back_btn.set_halign(Gtk.Align.CENTER)
-        self.back_btn.set_margin_top(20)
         self.back_btn.set_margin_end(10)
         self.back_btn.connect("clicked", self.on_continue_clicked)
         
@@ -149,15 +143,15 @@ class LinexinCenterStyleWidget(Gtk.Box):
         # Main container - make it clickable
         main_box = Gtk.Button()
         main_box.add_css_class("option_box")
-        main_box.set_size_request(300, 400)
+        main_box.set_size_request(260, 320)  # Reduced from 300x400
         main_box.connect("clicked", lambda btn, idx=index: self.on_option_selected(idx))
         
         # Content container
-        content_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
-        content_box.set_margin_top(30)
-        content_box.set_margin_bottom(30)
-        content_box.set_margin_start(20)
-        content_box.set_margin_end(20)
+        content_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=15)
+        content_box.set_margin_top(15)
+        content_box.set_margin_bottom(15)
+        content_box.set_margin_start(10)
+        content_box.set_margin_end(10)
         
         # Icon container with larger size
         icon_container = Gtk.Box()

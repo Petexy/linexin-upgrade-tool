@@ -13,14 +13,7 @@ gi.require_version("Adw", "1")
 
 from gi.repository import Gtk, Adw, Gdk, GLib
 
-# --- i18n Setup ---
-WIDGET_NAME = "linexin-installer-defaults-widget"
-LOCALE_DIR = "/usr/share/locale"
-locale.setlocale(locale.LC_ALL, '')
-locale.bindtextdomain(WIDGET_NAME, LOCALE_DIR)
-gettext.bindtextdomain(WIDGET_NAME, LOCALE_DIR)
-gettext.textdomain(WIDGET_NAME)
-_ = gettext.gettext
+from simple_localization_manager import get_localization_manager, _
 
 
 class InstallDefaultsWidget(Gtk.Box):
@@ -42,6 +35,9 @@ class InstallDefaultsWidget(Gtk.Box):
             **kwargs: Additional arguments passed to Gtk.Box
         """
         super().__init__(**kwargs)
+        
+        # Auto-register
+        get_localization_manager().register_widget(self)
         
         print("DEBUG: Starting new widget with individual commands")
         
@@ -72,44 +68,44 @@ class InstallDefaultsWidget(Gtk.Box):
         # Define applications with their specific installation commands
         self.applications = [
             {
-                "name": "Zen Browser",
-                "description": "Browse your internet with beautifully designed, privacy-focused app.", 
+                "name": _("Zen Browser"),
+                "description": _("Browse your internet with beautifully designed, privacy-focused app."), 
                 "icon": "icon1.png",
                 "command": "flatpak install app.zen_browser.zen --assumeyes"
             },
             {
-                "name": "Gear Lever",
-                "description": "Manage AppImages and replace old AppImageLauncher with a modern tool",
+                "name": _("Gear Lever"),
+                "description": _("Manage AppImages and replace old AppImageLauncher with a modern tool"),
                 "icon": "icon2.png", 
                 "command": "flatpak install it.mijorus.gearlever --assumeyes && run0 pacman -Rsc appimagelauncher --noconfirm 2>/dev/null || true"
             },
             {
-                "name": "Flatseal",
-                "description": "Manage Flatpak permissions with ease. No more pesky terminal commands.",
+                "name": _("Flatseal"),
+                "description": _("Manage Flatpak permissions with ease. No more pesky terminal commands."),
                 "icon": "icon3.png", 
                 "command": "flatpak install com.github.tchx84.Flatseal --assumeyes"
             },
             {
-                "name": "Bottles",
-                "description": "Run Windows software. ",
+                "name": _("Bottles"),
+                "description": _("Run Windows software. "),
                 "icon": "icon4.png",
                 "command": "flatpak install com.usebottles.bottles --assumeyes"
             },
             {
-                "name": "Heroic Launcher", 
-                "description": "Play Epic, GOG and Amazon Games",
+                "name": _("Heroic Launcher"), 
+                "description": _("Play Epic, GOG and Amazon Games"),
                 "icon": "icon5.png",
                 "command": "flatpak install com.heroicgameslauncher.hgl --assumeyes"
             },
             {
-                "name": "Faugus Launcher",
-                "description": "Play your games with a simple and lightweight app.", 
+                "name": _("Faugus Launcher"),
+                "description": _("Play your games with a simple and lightweight app."), 
                 "icon": "icon6.png",
                 "command": "flatpak install io.github.Faugus.faugus-launcher --assumeyes"
             },
             {
-                "name": "Twintail Launcher",
-                "description": "Run morally questionable anime games on Linexin.", 
+                "name": _("Twintail Launcher"),
+                "description": _("Run morally questionable anime games on Linexin."), 
                 "icon": "icon7.png",
                 "command": "flatpak install app.twintaillauncher.ttl --assumeyes"
             }
@@ -128,26 +124,24 @@ class InstallDefaultsWidget(Gtk.Box):
 
         navigation_btns = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
         navigation_btns.set_halign(Gtk.Align.CENTER)
-
+        navigation_btns.set_margin_top(30) # Standardized to 30
 
         self.continue_btn = Gtk.Button()
-        self.continue_btn.set_label("Continue")
+        self.continue_btn.set_label(_("Continue"))
         self.continue_btn.add_css_class("suggested-action")
         self.continue_btn.add_css_class("continue_button")
         self.continue_btn.set_size_request(200, 50)
         self.continue_btn.set_halign(Gtk.Align.CENTER)
         self.continue_btn.set_margin_end(10)
-        self.continue_btn.set_margin_top(20)
         self.continue_btn.connect("clicked", self.on_continue_clicked)
         
 
         self.back_btn = Gtk.Button()
-        self.back_btn.set_label("Back")
+        self.back_btn.set_label(_("Back"))
         #self.back_btn.add_css_class("suggested-action")
         self.back_btn.add_css_class("back_button")
         self.back_btn.set_size_request(200, 50)
         self.back_btn.set_halign(Gtk.Align.CENTER)
-        self.back_btn.set_margin_top(20)
         self.back_btn.set_margin_end(10)
         self.back_btn.connect("clicked", self.on_continue_clicked)
         
@@ -239,7 +233,7 @@ class InstallDefaultsWidget(Gtk.Box):
         
         # Install button
         install_btn = Gtk.Button()
-        install_btn.set_label("Install")
+        install_btn.set_label(_("Install"))
         install_btn.add_css_class("suggested-action")
         install_btn.add_css_class("install_button")
         install_btn.set_size_request(100, 40)
@@ -270,7 +264,7 @@ class InstallDefaultsWidget(Gtk.Box):
         print(f"DEBUG: Installing {button.app_name}")
         print(f"DEBUG: Running command: {button.install_command}")
         
-        button.set_label("Installing...")
+        button.set_label(_("Installing..."))
         button.set_sensitive(False)
         
         def run_installation():
@@ -303,11 +297,11 @@ class InstallDefaultsWidget(Gtk.Box):
     def installation_complete(self, button, success):
         """Called when installation completes"""
         if success:
-            button.set_label("Installed")
+            button.set_label(_("Installed"))
             button.add_css_class("success_button")
             print(f"DEBUG: {button.app_name} installation marked as successful")
         else:
-            button.set_label("Failed")
+            button.set_label(_("Failed"))
             button.add_css_class("error_button")
             button.set_sensitive(True)
             print(f"DEBUG: {button.app_name} installation marked as failed")

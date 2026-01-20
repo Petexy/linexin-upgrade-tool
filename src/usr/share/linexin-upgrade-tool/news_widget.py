@@ -9,47 +9,43 @@ gi.require_version("Adw", "1")
 
 from gi.repository import Gtk, Adw, Gdk, GLib
 
-# --- i18n Setup ---
-WIDGET_NAME = "linexin-installer-whats-new-widget"
-LOCALE_DIR = "/usr/share/locale"
-locale.setlocale(locale.LC_ALL, '')
-locale.bindtextdomain(WIDGET_NAME, LOCALE_DIR)
-gettext.bindtextdomain(WIDGET_NAME, LOCALE_DIR)
-gettext.textdomain(WIDGET_NAME)
-_ = gettext.gettext
+from simple_localization_manager import get_localization_manager, _
 
 
 class WhatsNewWidget(Gtk.Box):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        
+        # Auto-register for translation updates
+        get_localization_manager().register_widget(self)
 
         self.animation_played = False 
 
         # --- Carousel Data (Easy to modify) ---
         self.slides = [
             {
-                "title": "Completely revamped installation process",
-                "description": "Tired of seeing the same installer for every Linux distro? No worries! Linexin now uses proprietary installer!",
+                "title": _("Kinexin Desktop"),
+                "description": _("A meme becomes reality. Kinexin finally exists. It offers a carefully crafted Plasma experience with marvellous glass effects."),
                 "image_path": "1.png"
             },
             {
-                "title": "Support for Legacy Boot and Dual Boot",
-                "description": "Now you can install Linexin on older PCs as well as install it along other systems easily.",
+                "title": _("Linexin Package Manager"),
+                "description": _("Linpama (Linexin Package Manager) is a new pacman and AUR wrapper written specifically for Linexin. Customize your system with ease!"),
                 "image_path": "2.png"
             },
             {
-                "title": "Better AppImage support",
-                "description": "The AppImages are now handled using Gear Lever by default (older apps needs to be reinstalled from Applications folder)",
+                "title": _("Updated GNOME Extensions"),
+                "description": _("GNOME Extensions are now updated to the latest version. They also have been separated from the system, hence they can update automatically."),
                 "image_path": "3.png"
             },
             {
-                "title": "Unified Linexin Center",
-                "description": "All of the Linexin specific applications are now in one simple app called Linexin Center. No more clutter!",
+                "title": _("Easier installation"),
+                "description": _("No need to take care of your partitions when installing Linexin. Just select the partition or free space and let the installer do the rest."),
                 "image_path": "4.png"
             },
             {
-                "title": "More tools",
-                "description": "There are plenty of new applications that will make the Linexin experience better for new users.",
+                "title": _("Affinity 3 (2025) support"),
+                "description": _("Affinity Installer is more powerful than ever. With it you can install Affinity 3 (2025) on your system easily as well as older Affinity products."),
                 "image_path": "5.png"
             }
         ]
@@ -59,78 +55,78 @@ class WhatsNewWidget(Gtk.Box):
         self.animation_in_progress = False
 
         self.set_orientation(Gtk.Orientation.VERTICAL)
-        self.set_spacing(0)
-        self.set_valign(Gtk.Align.CENTER)
-        self.set_halign(Gtk.Align.CENTER)
+        # Main widget fills the available space
+        self.set_hexpand(True)
+        self.set_vexpand(True)
+        self.set_halign(Gtk.Align.FILL)
+        self.set_valign(Gtk.Align.FILL)
 
         # Add CSS for enhanced styling
         self.setup_custom_css()
 
-        # Create main container
+        # --- Robust Layout with Adw.Clamp ---
+        # Clamp ensures content never exceeds max size but scales down
+        self.clamp = Adw.Clamp()
+        self.clamp.set_maximum_size(800)
+        self.clamp.set_tightening_threshold(600)
+        self.append(self.clamp)
+
+        # Main container inside clamp
         self.main_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
-        self.main_container.set_margin_top(40)
-        self.main_container.set_margin_bottom(40)
-        self.main_container.set_margin_start(40)
-        self.main_container.set_margin_end(40)
+        self.main_container.set_margin_bottom(30) # Standardized
+        self.main_container.set_margin_top(30)
         self.main_container.set_valign(Gtk.Align.CENTER)
-        self.main_container.set_halign(Gtk.Align.CENTER)
         self.main_container.add_css_class("main_widget_container")
+        self.clamp.set_child(self.main_container)
 
-        # Title section - just the main title, larger
-        title_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
-        title_container.set_halign(Gtk.Align.CENTER)
-
+        # Title section
         self.main_title = Gtk.Label()
         self.main_title.set_markup(f'<span size="xx-large" weight="bold">{_("What has changed?")}</span>')
         self.main_title.add_css_class("main_title")
         self.main_title.set_halign(Gtk.Align.CENTER)
-        title_container.append(self.main_title)
+        self.main_container.append(self.main_title)
 
-        self.main_container.append(title_container)
-
-        # Carousel container with arrows and content
-        carousel_container = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=15)
-        carousel_container.set_halign(Gtk.Align.CENTER)
-        carousel_container.set_valign(Gtk.Align.CENTER)
-
+        # Carousel container (Arrow - Card - Arrow)
+        carousel_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=15)
+        carousel_row.set_halign(Gtk.Align.CENTER)
+        
         # Left arrow button
         self.left_arrow = Gtk.Button()
         self.left_arrow.set_icon_name("go-previous-symbolic")
         self.left_arrow.add_css_class("carousel_arrow")
         self.left_arrow.set_valign(Gtk.Align.CENTER)
         self.left_arrow.connect("clicked", self.on_previous_slide)
-        carousel_container.append(self.left_arrow)
+        carousel_row.append(self.left_arrow)
 
-        # Content box (image + text) - much larger now
+        # Content Card (Image + Text)
         self.content_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=15)
-        self.content_box.set_size_request(980, 620)  # Large enough for 960x540 image plus text
-        self.content_box.set_halign(Gtk.Align.CENTER)
-        self.content_box.set_valign(Gtk.Align.CENTER)
         self.content_box.add_css_class("content_box")
-
-        # Image container - much larger
-        self.image_container = Gtk.Box(halign=Gtk.Align.CENTER)
+        # Let the box fill the clamped width minus arrows
+        self.content_box.set_hexpand(True) 
+        
+        # Image
         self.slide_image = Gtk.Picture()
-        self.slide_image.set_size_request(960, 540)  # Full HD resolution
+        self.slide_image.set_size_request(480, 270)
         self.slide_image.set_can_shrink(True)
+        self.slide_image.set_content_fit(Gtk.ContentFit.CONTAIN) # Ensure aspect ratio
         self.slide_image.set_halign(Gtk.Align.CENTER)
         self.slide_image.add_css_class("slide_image")
         
         # Create placeholder image
         self.create_placeholder_image()
-        self.image_container.append(self.slide_image)
-        self.content_box.append(self.image_container)
+        self.content_box.append(self.slide_image)
 
         # Text container
         text_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
         text_container.set_halign(Gtk.Align.CENTER)
-        text_container.set_margin_top(10)
-
+        
         # Slide title
         self.slide_title = Gtk.Label()
         self.slide_title.add_css_class("slide_title")
         self.slide_title.set_halign(Gtk.Align.CENTER)
         self.slide_title.set_wrap(True)
+        self.slide_title.set_max_width_chars(40)
+        self.slide_title.set_justify(Gtk.Justification.CENTER)
         text_container.append(self.slide_title)
 
         # Slide description
@@ -138,11 +134,12 @@ class WhatsNewWidget(Gtk.Box):
         self.slide_description.add_css_class("slide_description")
         self.slide_description.set_halign(Gtk.Align.CENTER)
         self.slide_description.set_wrap(True)
-        self.slide_description.set_max_width_chars(60)
+        self.slide_description.set_max_width_chars(50)
+        self.slide_description.set_justify(Gtk.Justification.CENTER)
         text_container.append(self.slide_description)
 
         self.content_box.append(text_container)
-        carousel_container.append(self.content_box)
+        carousel_row.append(self.content_box)
 
         # Right arrow button
         self.right_arrow = Gtk.Button()
@@ -150,18 +147,17 @@ class WhatsNewWidget(Gtk.Box):
         self.right_arrow.add_css_class("carousel_arrow")
         self.right_arrow.set_valign(Gtk.Align.CENTER)
         self.right_arrow.connect("clicked", self.on_next_slide)
-        carousel_container.append(self.right_arrow)
+        carousel_row.append(self.right_arrow)
 
-        self.main_container.append(carousel_container)
+        self.main_container.append(carousel_row)
 
         # Continue button
-        button_container = Gtk.Box(halign=Gtk.Align.CENTER, spacing=20)
-        button_container.set_margin_top(20)
-        
         self.btn_continue = Gtk.Button(label=_("Continue"))
         self.btn_continue.add_css_class("suggested-action")
         self.btn_continue.add_css_class("continue_button")
         self.btn_continue.set_size_request(180, 45)
+        self.btn_continue.set_halign(Gtk.Align.CENTER)
+        self.btn_continue.set_margin_top(30) # Standardized
         
         # Add hover effects
         hover_controller = Gtk.EventControllerMotion()
@@ -169,10 +165,7 @@ class WhatsNewWidget(Gtk.Box):
         hover_controller.connect("leave", self.on_button_hover_leave)
         self.btn_continue.add_controller(hover_controller)
         
-        button_container.append(self.btn_continue)
-        self.main_container.append(button_container)
-
-        self.append(self.main_container)
+        self.main_container.append(self.btn_continue)
 
         # Load first slide
         self.update_slide_content()
@@ -207,45 +200,47 @@ class WhatsNewWidget(Gtk.Box):
         # If image loading fails, create a Cairo placeholder
         import cairo
         
-        surface = cairo.ImageSurface(cairo.FORMAT_RGB24, 960, 540)
+        # Reduced size to match widget constraints (was 960x540)
+        width, height = 480, 270
+        surface = cairo.ImageSurface(cairo.FORMAT_RGB24, width, height)
         ctx = cairo.Context(surface)
         
         # Set background color (light blue gradient)
-        gradient = cairo.LinearGradient(0, 0, 960, 540)
+        gradient = cairo.LinearGradient(0, 0, width, height)
         gradient.add_color_stop_rgb(0, 0.8, 0.85, 0.95)
         gradient.add_color_stop_rgb(1, 0.6, 0.75, 0.9)
         ctx.set_source(gradient)
-        ctx.rectangle(0, 0, 960, 540)
+        ctx.rectangle(0, 0, width, height)
         ctx.fill()
         
         # Add border
         ctx.set_source_rgb(0.4, 0.5, 0.7)
         ctx.set_line_width(3)
-        ctx.rectangle(1.5, 1.5, 957, 537)
+        ctx.rectangle(1.5, 1.5, width - 3, height - 3)
         ctx.stroke()
         
         # Add placeholder text
         ctx.set_source_rgb(0.2, 0.3, 0.5)
         ctx.select_font_face("Arial", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-        ctx.set_font_size(48)
+        ctx.set_font_size(24) # Reduced font
         text = f"Image not found"
         text_extents = ctx.text_extents(text)
-        x = (960 - text_extents.width) / 2
-        y = (540 + text_extents.height) / 2 - 30
+        x = (width - text_extents.width) / 2
+        y = (height + text_extents.height) / 2 - 15
         ctx.move_to(x, y)
         ctx.show_text(text)
         
         # Add subtitle
-        ctx.set_font_size(24)
+        ctx.set_font_size(14) # Reduced font
         subtitle = f"Looking for: {image_path}"
         text_extents = ctx.text_extents(subtitle)
-        x = (960 - text_extents.width) / 2
-        y = y + 60
+        x = (width - text_extents.width) / 2
+        y = y + 30
         ctx.move_to(x, y)
         ctx.show_text(subtitle)
         
         # Convert to GdkPixbuf and set to image
-        pixbuf = Gdk.pixbuf_get_from_surface(surface, 0, 0, 960, 540)
+        pixbuf = Gdk.pixbuf_get_from_surface(surface, 0, 0, width, height)
         self.slide_image.set_pixbuf(pixbuf)
 
     def setup_custom_css(self):
@@ -484,8 +479,8 @@ class WhatsNewWidget(Gtk.Box):
     def add_slide(self, title, description, image_path):
         """Add a new slide to the carousel"""
         new_slide = {
-            "title": title,
-            "description": description,
+            "title": _(title),
+            "description": _(description),
             "image_path": image_path
         }
         self.slides.append(new_slide)

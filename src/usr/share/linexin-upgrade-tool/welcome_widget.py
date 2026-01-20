@@ -13,19 +13,15 @@ gi.require_version("Adw", "1")
 # Import GLib for the timer and Adw for the animation
 from gi.repository import Gtk, Adw, Gdk, GLib
 
-# --- i18n Setup ---
-WIDGET_NAME = "linexin-installer-welcome-widget"
-LOCALE_DIR = "/usr/share/locale"
-locale.setlocale(locale.LC_ALL, '')
-locale.bindtextdomain(WIDGET_NAME, LOCALE_DIR)
-gettext.bindtextdomain(WIDGET_NAME, LOCALE_DIR)
-gettext.textdomain(WIDGET_NAME)
-_ = gettext.gettext
+from simple_localization_manager import get_localization_manager, _
 
 
 class WelcomeWidget(Gtk.Box):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        
+        # Auto-register for translation updates
+        get_localization_manager().register_widget(self)
 
         script_dir = os.path.dirname(os.path.abspath(__file__))
         image_path = os.path.join(script_dir, "images", "logo.png")
@@ -39,11 +35,11 @@ class WelcomeWidget(Gtk.Box):
         self.setup_custom_css()
 
         # Create main container with some breathing room
-        self.main_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=40)
-        self.main_container.set_margin_top(60)
-        self.main_container.set_margin_bottom(60)
-        self.main_container.set_margin_start(80)
-        self.main_container.set_margin_end(80)
+        self.main_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
+        self.main_container.set_margin_top(30)
+        self.main_container.set_margin_bottom(30)
+        self.main_container.set_margin_start(30)
+        self.main_container.set_margin_end(30)
         self.main_container.set_valign(Gtk.Align.CENTER)
         self.main_container.set_halign(Gtk.Align.CENTER)
         
@@ -51,7 +47,7 @@ class WelcomeWidget(Gtk.Box):
         self.main_container.add_css_class("main_widget_container")
 
         # Welcome text container - fixed height to prevent layout shifts
-        text_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
+        text_container = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         text_container.set_halign(Gtk.Align.CENTER)
         text_container.set_valign(Gtk.Align.CENTER)
         text_container.set_size_request(-1, 80)
@@ -73,13 +69,13 @@ class WelcomeWidget(Gtk.Box):
         self.welcome_image.set_halign(Gtk.Align.CENTER)
         self.welcome_image.set_valign(Gtk.Align.CENTER)
         self.welcome_image.add_css_class("logo_image")
-        self.welcome_image.set_size_request(250, 250)
+        self.welcome_image.set_size_request(200, 200) # Reduced from 250
         self.logo_container.append(self.welcome_image)
         self.main_container.append(self.logo_container)
 
         # Button container with hover effects
         button_container = Gtk.Box(halign=Gtk.Align.CENTER, spacing=20)
-        button_container.set_margin_top(40)
+        button_container.set_margin_top(30) # Standardized to 30
         
         self.btn_install = Gtk.Button(label=_("Begin"))
         self.btn_install.add_css_class("suggested-action")

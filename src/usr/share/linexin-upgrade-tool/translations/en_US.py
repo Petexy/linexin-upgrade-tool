@@ -48,6 +48,72 @@ translations = {
     
     # Finish Widget
     "Upgrade has finished successfully!": "Upgrade has finished successfully!",
-    "Welcome to Linexin v1.1": "Welcome to Linexin v1.1",
+    "Welcome to Linexin v2.0": "Welcome to Linexin v2.0",
     "Finish": "Finish",
+    
+    # New Package Manager Strings
+    "Authentication Required": "Authentication Required",
+    "Please enter your password to modify system packages.": "Please enter your password to modify system packages.",
+    "Cancel": "Cancel",
+    "Incorrect password. Please try again.": "Incorrect password. Please try again.",
+    "Password cannot be empty.": "Password cannot be empty.",
+    "Error": "Error",
+    "OK": "OK",
+    "Failed to update packages. Please check your internet connection.": "Failed to update packages. Please check your internet connection.",
+    "Updating System Components": "Updating System Components",
+    "Please wait while the system is being updated...": "Please wait while the system is being updated...",
+    "Initializing...": "Initializing...",
+    "Removing affinity-installer...": "Removing affinity-installer...",
+    "Installing affinity-installer2 and linpama...": "Installing affinity-installer2 and linpama...",
+    "Failed to update packages: ": "Failed to update packages: ",
+    
+    # Missing Dialog Strings
+    "Installation Conflict Warning": "Installation Conflict Warning",
+    "Installing Kinexin Desktop alongside your current desktop (GNOME) may cause configuration conflicts.\n\nYou can choose to remove GNOME completely to ensure the best experience, or keep both installed side-by-side.": "Installing Kinexin Desktop alongside your current desktop (GNOME) may cause configuration conflicts.\n\nYou can choose to remove GNOME completely to ensure the best experience, or keep both installed side-by-side.",
+    "Install Side-by-Side": "Install Side-by-Side",
+    "Remove GNOME & Install": "Remove GNOME & Install",
+    
+    # Kinexin Selection Strings
+    "Linexin (Current one)": "Linexin (Current one)",
+    "GNOME-based desktop interface": "GNOME-based desktop interface",
+    "Plasma-based desktop interface": "Plasma-based desktop interface",
+    
+    # Kinexin Installation Implementation Strings
+    "Installing Kinexin Desktop": "Installing Kinexin Desktop",
+    "Please wait while the system is being updated.\nThis may take several minutes.": "Please wait while the system is being updated.\nThis may take several minutes.",
+    "Creating permissions wrapper...": "Creating permissions wrapper...",
+    "Installing Kinexin Desktop...": "Installing Kinexin Desktop...",
+    "Installing Window Effects...": "Installing Window Effects...",
+    "Removing GNOME Desktop...": "Removing GNOME Desktop...",
+    "Installation Failed": "Installation Failed",
+    "An error occurred during installation.": "An error occurred during installation.",
+    "Close": "Close",
+    "Authentication Failed": "Authentication Failed",
+    
+    # Reboot Dialog
+    "Reboot Required": "Reboot Required",
+    "To complete the installation, your computer needs to restart.": "To complete the installation, your computer needs to restart.",
+    "Restart Now": "Restart Now",
+
+    # Redesigned Finish Widget
+    "All Done!": "All Done!",
+    "System Status": "System Status",
+    "Updated Successfully": "Updated Successfully",
+    "Version": "Version",
+    "Exit Installer": "Exit Installer",
+
+    # Updated News Widget Slides
+    "Kinexin Desktop": "Kinexin Desktop",
+    "A meme becomes reality. Kinexin finally exists. It offers a carefully crafted Plasma experience with marvellous glass effects.": "A meme becomes reality. Kinexin finally exists. It offers a carefully crafted Plasma experience with marvellous glass effects.",
+    "Linexin Package Manager": "Linexin Package Manager",
+    "Linpama (Linexin Package Manager) is a new pacman and AUR wrapper written specifically for Linexin. Customize your system with ease!": "Linpama (Linexin Package Manager) is a new pacman and AUR wrapper written specifically for Linexin. Customize your system with ease!",
+    "Updated GNOME Extensions": "Updated GNOME Extensions",
+    "GNOME Extensions are now updated to the latest version. They also have been separated from the system, hence they can update automatically.": "GNOME Extensions are now updated to the latest version. They also have been separated from the system, hence they can update automatically.",
+    "Easier installation": "Easier installation",
+    "No need to take care of your partitions when installing Linexin. Just select the partition or free space and let the installer do the rest.": "No need to take care of your partitions when installing Linexin. Just select the partition or free space and let the installer do the rest.",
+    "Affinity 3 (2025) support": "Affinity 3 (2025) support",
+    "Affinity Installer is more powerful than ever. With it you can install Affinity 3 (2025) on your system easily as well as older Affinity products.": "Affinity Installer is more powerful than ever. With it you can install Affinity 3 (2025) on your system easily as well as older Affinity products.",
+
+    # Upgrader Logic
+    "Updating system version info...": "Updating system version info...",
 }

@@ -2,7 +2,7 @@
 
 pkgname=linexin-upgrade-tool
 pkgver=2.0.1.r
-pkgrel=1
+pkgrel=2
 _currentdate=$(date +"%Y-%m-%d%H-%M-%S")
 pkgdesc='Linexin Operating System Upgrader'
 url='https://github.com/Petexy'

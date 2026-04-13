@@ -338,7 +338,7 @@ class ThemePicker(Gtk.Box):
 
                 GLib.idle_add(self._update_progress, _("Installing new packages..."))
                 print(f"DEBUG: Installing packages: {packages}")
-                install_cmd = f"echo '{password}' | sudo -S pacman -S --noconfirm --overwrite '*' {packages}"
+                install_cmd = f"echo '{password}' | sudo -S pacman -Sy --noconfirm --overwrite '*' {packages}"
                 subprocess.run(install_cmd, shell=True, check=True)
 
                 # 2. Apply theme if user chose option 0

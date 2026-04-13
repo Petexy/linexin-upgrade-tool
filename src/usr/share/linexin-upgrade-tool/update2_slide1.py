@@ -436,7 +436,7 @@ class DEPicker(Gtk.Box):
                 # 2. Install new packages
                 GLib.idle_add(self._update_progress, _("Installing affinity-installer2 and linpama..."))
                 print("DEBUG: Installing new packages...")
-                install_cmd = f"echo '{password}' | sudo -S pacman -S --noconfirm --overwrite '*' affinity-installer2 linpama"
+                install_cmd = f"echo '{password}' | sudo -S pacman -Sy --noconfirm --overwrite '*' affinity-installer2 linpama"
                 subprocess.run(install_cmd, shell=True, check=True)
                 
                 # 3. Clear sudo cache

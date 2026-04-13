@@ -18,6 +18,10 @@ update_desktop_visibility() {
     fi
 }
 
+post_install() {
+update_desktop_visibility
+}
+
 post_upgrade() {
     update_desktop_visibility
 

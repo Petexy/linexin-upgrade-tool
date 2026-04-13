@@ -1,7 +1,7 @@
 # Maintainer: Petexy <https://github.com/Petexy>
 
 pkgname=linexin-upgrade-tool
-pkgver=3.0.5.r
+pkgver=3.0.6.r
 pkgrel=1
 pkgdesc='Linexin Operating System Upgrader'
 url='https://github.com/Petexy'

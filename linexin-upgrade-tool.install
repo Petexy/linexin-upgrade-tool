@@ -2,7 +2,14 @@ update_desktop_visibility() {
     local version_file="/version"
     local desktop_file="/usr/share/applications/github.petexy.linexinupgradetool.desktop"
 
-    if [[ -f "$version_file" ]] && [[ -f "$desktop_file" ]]; then
+    if [[ ! -f "$version_file" ]]; then
+        if [[ -f "$desktop_file" ]]; then
+            sed -i 's/^NoDisplay=.*/NoDisplay=true/' "$desktop_file"
+        fi
+        return
+    fi
+
+    if [[ -f "$desktop_file" ]]; then
         local version_date=$(grep -oE '[0-9]{4}\.[0-9]{2}\.[0-9]{2}' "$version_file" | head -n1)
         
         if [[ -n "$version_date" ]]; then

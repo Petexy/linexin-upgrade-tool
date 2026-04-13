@@ -75,13 +75,13 @@ class DEPicker(Gtk.Box):
             {
                 "name": _("Linexin (Current one)"),
                 "description": _("GNOME-based desktop interface"),
-                "icon": "screen1.png",
+                "icon": "screen1_update2.png",
                 "requires_internet": False
             },
             {
                 "name": "Kinexin",
                 "description": _("Plasma-based desktop interface"),
-                "icon": "screen2.png",
+                "icon": "screen2_update2.png",
                 "requires_internet": True
             }
         ]

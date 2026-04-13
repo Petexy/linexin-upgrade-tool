@@ -47,9 +47,9 @@ class InstallDefaultsWidget(Gtk.Box):
         
         # Basic widget setup
         self.set_orientation(Gtk.Orientation.VERTICAL)
-        self.set_spacing(20)
-        self.set_margin_top(30)
-        self.set_margin_bottom(30)
+        self.set_spacing(8)
+        self.set_margin_top(15)
+        self.set_margin_bottom(15)
         self.set_margin_start(50)
         self.set_margin_end(50)
         
@@ -58,7 +58,7 @@ class InstallDefaultsWidget(Gtk.Box):
         
         # Title
         title = Gtk.Label()
-        title.set_markup('<span size="xx-large" weight="bold">Install new apps</span>')
+        title.set_markup(f'<span size="xx-large" weight="bold">{_("Install new apps")}</span>')
         title.set_halign(Gtk.Align.CENTER)
         self.append(title)
         
@@ -87,7 +87,7 @@ class InstallDefaultsWidget(Gtk.Box):
             },
             {
                 "name": _("Bottles"),
-                "description": _("Run Windows software. "),
+                "description": _("Run Windows software."),
                 "icon": "icon4.png",
                 "command": "flatpak install com.usebottles.bottles --assumeyes"
             },
@@ -124,7 +124,7 @@ class InstallDefaultsWidget(Gtk.Box):
 
         navigation_btns = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
         navigation_btns.set_halign(Gtk.Align.CENTER)
-        navigation_btns.set_margin_top(30) # Standardized to 30
+        navigation_btns.set_margin_top(10) # Standardized to 30
 
         self.continue_btn = Gtk.Button()
         self.continue_btn.set_label(_("Continue"))
@@ -173,7 +173,7 @@ class InstallDefaultsWidget(Gtk.Box):
         # Main container
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=15)
         box.add_css_class("app_box")
-        box.set_size_request(-1, 70)
+        box.set_size_request(-1, 50)
         
         # Icon container
         icon_container = Gtk.Box()
@@ -339,7 +339,7 @@ class InstallDefaultsWidget(Gtk.Box):
             background: @theme_base_color;
             border: 1px solid rgba(0,0,0,0.1);
             border-radius: 10px;
-            padding: 15px;
+            padding: 8px;
             margin: 0px 0;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);

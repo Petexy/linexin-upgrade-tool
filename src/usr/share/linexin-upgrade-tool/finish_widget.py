@@ -42,10 +42,10 @@ class FinishWidget(Gtk.Box):
         self.append(self.clamp)
 
         # 2. Main Glass Card Container
-        self.card_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=25)
+        self.card_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=15)
         self.card_box.add_css_class("finish-glass-card")
-        self.card_box.set_margin_top(40) # Spacing from top
-        self.card_box.set_margin_bottom(40)
+        self.card_box.set_margin_top(20) # Spacing from top
+        self.card_box.set_margin_bottom(20)
         self.card_box.set_margin_start(20)
         self.card_box.set_margin_end(20)
         self.clamp.set_child(self.card_box)
@@ -55,7 +55,7 @@ class FinishWidget(Gtk.Box):
         # 1. Hero Icon Area (Animated)
         self.icon_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.icon_box.set_halign(Gtk.Align.CENTER)
-        self.icon_box.set_margin_top(20)
+        self.icon_box.set_margin_top(10)
         
         # We can use a large symbolic icon or an image if available
         # Using a composed overlaid icon for a "premium" feel
@@ -82,7 +82,7 @@ class FinishWidget(Gtk.Box):
         
         self.subtitle_label = Gtk.Label()
         localization_manager = get_localization_manager()
-        self.subtitle_label.set_markup(f'<span size="large" alpha="80%">{localization_manager.get_text("Welcome to Linexin v2.0")}</span>')
+        self.subtitle_label.set_markup(f'<span size="large" alpha="80%">{localization_manager.get_text("Welcome to Linexin v2.1")}</span>')
         self.subtitle_label.add_css_class("finish-subtitle")
         self.subtitle_label.set_wrap(True)
         self.subtitle_label.set_justify(Gtk.Justification.CENTER)
@@ -102,7 +102,7 @@ class FinishWidget(Gtk.Box):
         self.details_frame.append(row1)
         
         # Row 2: version
-        row2 = self.create_detail_row("info-symbolic", _("Version"), "2.0 (Stable)")
+        row2 = self.create_detail_row("info-symbolic", _("Version"), "2.1 (Stable)")
         self.details_frame.append(row2)
         
         self.card_box.append(self.details_frame)
@@ -110,7 +110,7 @@ class FinishWidget(Gtk.Box):
         # 4. Action Area
         self.action_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=15)
         self.action_box.set_halign(Gtk.Align.CENTER)
-        self.action_box.set_margin_top(30) # Standardized top margin for buttons
+        self.action_box.set_margin_top(15) # Standardized top margin for buttons
         
         # Back Button (Hidden by default, kept for logic compat)
         self.btn_back = Gtk.Button(label=_("Back"))
@@ -131,7 +131,7 @@ class FinishWidget(Gtk.Box):
 
         # --- Animation Setup ---
         self.card_box.set_opacity(0)
-        self.card_box.set_margin_top(100) # Start lower for slide-up effect
+        self.card_box.set_margin_top(60) # Start lower for slide-up effect
         self.connect("map", self.on_widget_mapped)
 
     def create_detail_row(self, icon_name, label_text, value_text):
@@ -163,7 +163,7 @@ class FinishWidget(Gtk.Box):
             background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 24px;
-            padding: 40px;
+            padding: 25px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.2);
             backdrop-filter: blur(20px);
         }
@@ -293,7 +293,26 @@ class FinishWidget(Gtk.Box):
     def set_sudo_password(self, password):
         self.sudo_password = password
 
+    def _is_system_updating(self):
+        """Check if Linexin Updater is currently updating the system."""
+        # Check pacman database lock
+        if os.path.exists("/var/lib/pacman/db.lck"):
+            return True
+        # Check for running update processes (paru, makepkg, flatpak update)
+        for check in [["pgrep", "-x", "paru"], ["pgrep", "-x", "makepkg"], ["pgrep", "-f", "flatpak update"]]:
+            try:
+                result = subprocess.run(check, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                if result.returncode == 0:
+                    return True
+            except Exception:
+                pass
+        return False
+
     def show_reboot_dialog(self):
+        if self._is_system_updating():
+            self._show_update_in_progress_dialog()
+            return
+
         root = self.get_root()
         dialog = Adw.MessageDialog(
             transient_for=root,
@@ -305,27 +324,74 @@ class FinishWidget(Gtk.Box):
         dialog.connect("response", self.on_reboot_response)
         dialog.present()
 
+    def _show_update_in_progress_dialog(self):
+        root = self.get_root()
+        dialog = Adw.MessageDialog(
+            transient_for=root,
+            heading=_("System Update in Progress"),
+            body=_("Linexin Updater is currently updating your system. Please wait for the update to finish before restarting.")
+        )
+        dialog.add_response("ok", _("OK"))
+        dialog.set_default_response("ok")
+        dialog.connect("response", self._on_update_in_progress_response)
+        dialog.present()
+
+    def _on_update_in_progress_response(self, dialog, response):
+        dialog.close()
+        self.btn_finish.set_sensitive(True)
+        self.btn_back.set_sensitive(True)
+
     def on_reboot_response(self, dialog, response):
         dialog.close()
         # Set force_close on the main window to allow it to close during reboot
         root = self.get_root()
         if hasattr(root, 'force_close'):
             root.force_close = True
-            
-        # Trigger reboot
+
+        # Write reboot flag for the autostart wrapper (runs as root) to pick up
+        try:
+            with open("/tmp/linexin-reboot-needed", "w") as f:
+                f.write("1")
+        except Exception as e:
+            print(f"Warning: Could not write reboot flag: {e}")
+
+        # Try reboot methods in order of reliability
+        rebooted = False
+
+        # Method 1: sudo with password (if available), pass via stdin to avoid shell injection
         if hasattr(self, 'sudo_password') and self.sudo_password:
-             try:
-                 # Use sudo with password
-                 cmd = f"echo '{self.sudo_password}' | sudo -S reboot"
-                 subprocess.run(cmd, shell=True)
-             except Exception as e:
-                 print(f"Sudo reboot failed, trying systemctl: {e}")
-                 subprocess.run(["systemctl", "reboot"])
-        else:
-             # Fallback
-             subprocess.run(["systemctl", "reboot"])
-             
-        # Also quit the app to be sure
+            try:
+                proc = subprocess.Popen(
+                    ["sudo", "-S", "reboot"],
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE
+                )
+                proc.communicate(input=(self.sudo_password + "\n").encode())
+                rebooted = True
+            except Exception as e:
+                print(f"Sudo reboot failed: {e}")
+
+        # Method 2: gdbus call to systemd-logind (works for active desktop session)
+        if not rebooted:
+            try:
+                subprocess.Popen(["gdbus", "call", "--system",
+                    "--dest", "org.freedesktop.login1",
+                    "--object-path", "/org/freedesktop/login1",
+                    "--method", "org.freedesktop.login1.Manager.Reboot", "true"])
+                rebooted = True
+            except Exception as e:
+                print(f"gdbus logind reboot failed: {e}")
+
+        # Method 3: systemctl reboot
+        if not rebooted:
+            try:
+                subprocess.Popen(["systemctl", "reboot"])
+            except Exception as e:
+                print(f"systemctl reboot failed: {e}")
+
+        # Quit the app — if running from autostart wrapper, it will handle
+        # the reboot as root after seeing the flag file
         app = root.get_application()
         if app: app.quit()
 

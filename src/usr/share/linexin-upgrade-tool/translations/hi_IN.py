@@ -103,6 +103,7 @@ translations = {
     "Version": "संस्करण",
     "Exit Installer": "इंस्टॉलर से बाहर निकलें",
     "Kinexin Desktop": "Kinexin डेस्कटॉप",
+    "A meme becomes reality. Kinexin finally exists. It offers a carefully crafted Plasma experience with marvellous glass effects.": "एक मीम हकीकत बन जाता है। Kinexin आखिरकार मौजूद है। यह शानदार ग्लास प्रभावों के साथ एक सुंदर Plasma अनुभव प्रदान करता है।",
     "Linexin Package Manager": "Linexin पैकेज मैनेजर",
     "Linpama (Linexin Package Manager) is a new pacman and AUR wrapper written specifically for Linexin. Customize your system with ease!": "Linpama (Linexin पैकेज मैनेजर) Linexin के लिए विशेष रूप से लिखा गया एक नया pacman और AUR रैपर है। अपने सिस्टम को आसानी से कस्टमाइज़ करें!",
     "Updated GNOME Extensions": "अद्यतन GNOME एक्सटेंशन",
@@ -112,4 +113,28 @@ translations = {
     "Affinity 3 (2025) support": "Affinity 3 (2025) समर्थन",
     "Affinity Installer is more powerful than ever. With it you can install Affinity 3 (2025) on your system easily as well as older Affinity products.": "एफिनिटी इंस्टॉलर पहले से कहीं ज्यादा शक्तिशाली है। इसके साथ आप अपने सिस्टम पर Affinity 3 (2025) के साथ-साथ पुराने एफिनिटी उत्पादों को भी आसानी से स्थापित कर सकते हैं।",
     "Updating system version info...": "सिस्टम संस्करण जानकारी अपडेट की जा रही है...",
+
+    # ThemePicker (update3_slide1)
+    "Use new Linexin theme": "नई Linexin थीम का उपयोग करें",
+    "Apply the latest Linexin look and feel to your desktop.": "अपने डेस्कटॉप पर नवीनतम Linexin रूप लागू करें।",
+    "Keep current theme": "वर्तमान थीम रखें",
+    "Do not change your current theme settings.": "अपनी वर्तमान थीम सेटिंग्स न बदलें।",
+    "Installing new packages...": "नए पैकेज इंस्टॉल हो रहे हैं...",
+    "Applying new theme...": "नई थीम लागू की जा रही है...",
+
+    # New News Widget Slides
+    "Kinexin Decoration": "Kinexin सजावट",
+    "Completely redesigned window decoration for Kinexin Desktop with a modern look and feel is here! Fully customizable and more efficient than ever.": "Kinexin Desktop के लिए पूरी तरह से पुनर्डिज़ाइन की गई विंडो सजावट आधुनिक लुक के साथ यहां है! पूरी तरह अनुकूलनीय और पहले से कहीं अधिक कुशल।",
+    "Unified User Interface": "एकीकृत उपयोगकर्ता इंटरफ़ेस",
+    "Linexin and Kinexin have never been closer. The theme is now unified across the system for GTK-4.0 and GTK-3.0, providing a seamless experience whether you're using Linexin or Kinexin.": "Linexin और Kinexin कभी इतने करीब नहीं रहे। थीम अब GTK-4.0 और GTK-3.0 के लिए पूरे सिस्टम में एकीकृत है, चाहे आप Linexin उपयोग करें या Kinexin, एक निर्बाध अनुभव प्रदान करती है।",
+    "Advanced Installation Options": "उन्नत इंस्टॉलेशन विकल्प",
+    "Ever wanted to install Linexin but didn't want to include apps like Steam? Now you can! The new installer allows you to choose which components to install, giving you more control over your system setup.": "क्या आप Linexin इंस्टॉल करना चाहते थे लेकिन Steam जैसी एप्स नहीं चाहते थे? अब आप कर सकते हैं! नया इंस्टॉलर आपको यह चुनने देता है कि कौन से घटक इंस्टॉल करने हैं, जिससे आपको अपने सिस्टम सेटअप पर अधिक नियंत्रण मिलता है।",
+    "Hello, Linexin!": "नमस्ते, Linexin!",
+    "When you open Linexin Center for the first time, you'll be greeted with a new Linexin Hello widget that introduces you to the world of Linexin. It's designed to be informative and visually appealing, giving you the option to remove or install the widgets prepared for Linexin.": "जब आप पहली बार Linexin Center खोलते हैं, तो एक नया Linexin Hello विजेट आपका स्वागत करेगा जो आपको Linexin की दुनिया से परिचित कराता है। इसे जानकारीपूर्ण और दृश्टिगत रूप से आकर्षक होने के लिए डिज़ाइन किया गया है, जो आपको Linexin के लिए तैयार विजेट हटाने या इंस्टॉल करने का विकल्प देता है।",
+    "First Impressions Matter": "पहला प्रभाव मायने रखता है",
+    "Linexin LiveCD now uses a beautifully themed GRUB bootloader instead of systemd-boot. No more scary text-based boot menu! The new GRUB menu is visually appealing and provides a more user-friendly experience when selecting your boot options.": "Linexin LiveCD अब systemd-boot की जगह सुंदर थीम वाले GRUB बूटलोडर का उपयोग करता है। अब कोई डरावना टेक्स्ट-आधारित बूट मेनू नहीं! नया GRUB मेनू दृश्टिगत रूप से आकर्षक है और बूट विकल्पों का चयन करते समय अधिक उपयोगकर्ता-अनुकूल अनुभव प्रदान करता है।",
+
+    # Reboot Prevention
+    "System Update in Progress": "सिस्टम अपडेट प्रगति पर है",
+    "Linexin Updater is currently updating your system. Please wait for the update to finish before restarting.": "Linexin Updater वर्तमान में आपके सिस्टम को अपडेट कर रहा है। कृपया पुनरारंभ करने से पहले अपडेट समाप्त होने की प्रतीक्षा करें।",
 }

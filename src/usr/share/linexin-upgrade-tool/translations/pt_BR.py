@@ -103,6 +103,7 @@ translations = {
     "Version": "Versão",
     "Exit Installer": "Sair do instalador",
     "Kinexin Desktop": "Kinexin Desktop",
+    "A meme becomes reality. Kinexin finally exists. It offers a carefully crafted Plasma experience with marvellous glass effects.": "Um meme se torna realidade. Kinexin finalmente existe. Ele oferece uma experiência Plasma cuidadosamente elaborada com maravilhosos efeitos de vidro.",
     "Linexin Package Manager": "Gerenciador de Pacotes Linexin",
     "Linpama (Linexin Package Manager) is a new pacman and AUR wrapper written specifically for Linexin. Customize your system with ease!": "Linpama (Gerenciador de Pacotes Linexin) é um novo wrapper pacman e AUR escrito especificamente para Linexin. Personalize seu sistema com facilidade!",
     "Updated GNOME Extensions": "Extensões do GNOME Atualizadas",
@@ -112,4 +113,28 @@ translations = {
     "Affinity 3 (2025) support": "Suporte ao Affinity 3 (2025)",
     "Affinity Installer is more powerful than ever. With it you can install Affinity 3 (2025) on your system easily as well as older Affinity products.": "O Instalador Affinity está mais poderoso do que nunca. Com ele você pode instalar o Affinity 3 (2025) em seu sistema facilmente, bem como produtos Affinity mais antigos.",
     "Updating system version info...": "Atualizando informações da versão do sistema...",
+
+    # ThemePicker (update3_slide1)
+    "Use new Linexin theme": "Usar novo tema do Linexin",
+    "Apply the latest Linexin look and feel to your desktop.": "Aplique a aparência mais recente do Linexin ao seu desktop.",
+    "Keep current theme": "Manter tema atual",
+    "Do not change your current theme settings.": "Não alterar as configurações de tema atuais.",
+    "Installing new packages...": "Instalando novos pacotes...",
+    "Applying new theme...": "Aplicando novo tema...",
+
+    # New News Widget Slides
+    "Kinexin Decoration": "Decoração Kinexin",
+    "Completely redesigned window decoration for Kinexin Desktop with a modern look and feel is here! Fully customizable and more efficient than ever.": "A decoração de janela completamente redesenhada para o Kinexin Desktop com visual moderno chegou! Totalmente personalizável e mais eficiente do que nunca.",
+    "Unified User Interface": "Interface de Usuário Unificada",
+    "Linexin and Kinexin have never been closer. The theme is now unified across the system for GTK-4.0 and GTK-3.0, providing a seamless experience whether you're using Linexin or Kinexin.": "Linexin e Kinexin nunca estiveram tão próximos. O tema agora é unificado em todo o sistema para GTK-4.0 e GTK-3.0, proporcionando uma experiência perfeita seja usando Linexin ou Kinexin.",
+    "Advanced Installation Options": "Opções Avançadas de Instalação",
+    "Ever wanted to install Linexin but didn't want to include apps like Steam? Now you can! The new installer allows you to choose which components to install, giving you more control over your system setup.": "Sempre quis instalar o Linexin mas não queria incluir apps como Steam? Agora você pode! O novo instalador permite escolher quais componentes instalar, dando mais controle sobre a configuração do seu sistema.",
+    "Hello, Linexin!": "Olá, Linexin!",
+    "When you open Linexin Center for the first time, you'll be greeted with a new Linexin Hello widget that introduces you to the world of Linexin. It's designed to be informative and visually appealing, giving you the option to remove or install the widgets prepared for Linexin.": "Quando você abre o Linexin Center pela primeira vez, será recebido por um novo widget Linexin Hello que o apresenta ao mundo do Linexin. Ele foi projetado para ser informativo e visualmente atraente, dando a opção de remover ou instalar os widgets preparados para o Linexin.",
+    "First Impressions Matter": "As Primeiras Impressões Importam",
+    "Linexin LiveCD now uses a beautifully themed GRUB bootloader instead of systemd-boot. No more scary text-based boot menu! The new GRUB menu is visually appealing and provides a more user-friendly experience when selecting your boot options.": "O Linexin LiveCD agora usa um bootloader GRUB lindamente temático em vez do systemd-boot. Chega de menu de inicialização assustador baseado em texto! O novo menu GRUB é visualmente atraente e proporciona uma experiência mais amigável ao selecionar as opções de inicialização.",
+
+    # Reboot Prevention
+    "System Update in Progress": "Atualização do Sistema em Andamento",
+    "Linexin Updater is currently updating your system. Please wait for the update to finish before restarting.": "O Linexin Updater está atualizando seu sistema. Por favor, aguarde a atualização terminar antes de reiniciar.",
 }

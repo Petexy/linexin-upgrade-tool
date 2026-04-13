@@ -78,7 +78,7 @@ fi
 # --- Autorun Logic Check ---
 # Only autorun if /version is BEFORE 2026.01.23
 VERSION_FILE="/version"
-CUTOFF_DATE="20260122"
+CUTOFF_DATE="20260413"
 
 should_run=true
 if [ -f "$VERSION_FILE" ]; then
@@ -102,16 +102,25 @@ else
 fi
 
 if [ "$should_run" = false ]; then
+    # Hide the desktop entry from the system menu after upgrade is complete
+    DESKTOP_FILE="/usr/share/applications/github.petexy.linexinupgradetool.desktop"
+    if [ -f "$DESKTOP_FILE" ]; then
+        sed -i 's/^NoDisplay=false$/NoDisplay=true/' "$DESKTOP_FILE"
+    fi
     exit 0
 fi
 # ---------------------------
 
 echo "Launching application..."
 
-# Use exec to replace this shell process with the application.
+# Run the application as the target user.
 # Propagate critical environment variables.
+# Do NOT exec — we need to check for a reboot flag after exit.
 
-exec sudo -u "$TARGET_USER" env \
+REBOOT_FLAG="/tmp/linexin-reboot-needed"
+rm -f "$REBOOT_FLAG"
+
+sudo -u "$TARGET_USER" env \
     DISPLAY="$DISPLAY" \
     XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" \
     XAUTHORITY="$XAUTHORITY" \
@@ -119,4 +128,14 @@ exec sudo -u "$TARGET_USER" env \
     DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" \
     /usr/bin/python /usr/share/linexin-upgrade-tool/upgrader
 
-echo "Error: Failed to exec application."
+APP_EXIT=$?
+echo "Application exited with code $APP_EXIT"
+
+# Check if the app requested a reboot
+if [ -f "$REBOOT_FLAG" ]; then
+    echo "Reboot flag found. Rebooting system..."
+    rm -f "$REBOOT_FLAG"
+    /usr/bin/systemctl reboot
+else
+    echo "No reboot requested."
+fi

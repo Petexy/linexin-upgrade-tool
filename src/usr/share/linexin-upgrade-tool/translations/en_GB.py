@@ -49,6 +49,7 @@ translations = {
     # Finish Widget
     "Upgrade has finished successfully!": "Upgrade has finished successfully!",
     "Welcome to Linexin v1.1": "Welcome to Linexin v1.1",
+    "Welcome to Linexin v2.0": "Welcome to Linexin v2.0",
     "Finish": "Finish",
     
     # New Package Manager Strings
@@ -74,14 +75,11 @@ translations = {
     "Remove GNOME & Install": "Remove GNOME & Install",
 
     # --- Auto-synced new keys ---
-    "Welcome to Linexin v2.0": "Welcome to Linexin v2.0", # TODO: Translate
     "Linexin (Current one)": "Linexin (Current one)", # TODO: Translate
     "GNOME-based desktop interface": "GNOME-based desktop interface", # TODO: Translate
     "Plasma-based desktop interface": "Plasma-based desktop interface", # TODO: Translate
     "Installing Kinexin Desktop": "Installing Kinexin Desktop", # TODO: Translate
-    "Please wait while the system is being updated.
-This may take several minutes.": "Please wait while the system is being updated.
-This may take several minutes.", # TODO: Translate
+    "Please wait while the system is being updated.\nThis may take several minutes.": "Please wait while the system is being updated.\nThis may take several minutes.", # TODO: Translate
     "Creating permissions wrapper...": "Creating permissions wrapper...", # TODO: Translate
     "Installing Kinexin Desktop...": "Installing Kinexin Desktop...", # TODO: Translate
     "Installing Window Effects...": "Installing Window Effects...", # TODO: Translate
@@ -99,6 +97,7 @@ This may take several minutes.", # TODO: Translate
     "Version": "Version",
     "Exit Installer": "Exit Installer",
     "Kinexin Desktop": "Kinexin Desktop",
+    "A meme becomes reality. Kinexin finally exists. It offers a carefully crafted Plasma experience with marvellous glass effects.": "A meme becomes reality. Kinexin finally exists. It offers a carefully crafted Plasma experience with marvellous glass effects.",
     "Linexin Package Manager": "Linexin Package Manager",
     "Linpama (Linexin Package Manager) is a new pacman and AUR wrapper written specifically for Linexin. Customize your system with ease!": "Linpama (Linexin Package Manager) is a new pacman and AUR wrapper written specifically for Linexin. Customize your system with ease!",
     "Updated GNOME Extensions": "Updated GNOME Extensions",
@@ -108,4 +107,28 @@ This may take several minutes.", # TODO: Translate
     "Affinity 3 (2025) support": "Affinity 3 (2025) support",
     "Affinity Installer is more powerful than ever. With it you can install Affinity 3 (2025) on your system easily as well as older Affinity products.": "Affinity Installer is more powerful than ever. With it you can install Affinity 3 (2025) on your system easily as well as older Affinity products.",
     "Updating system version info...": "Updating system version info...",
+
+    # ThemePicker (update3_slide1)
+    "Use new Linexin theme": "Use new Linexin theme",
+    "Apply the latest Linexin look and feel to your desktop.": "Apply the latest Linexin look and feel to your desktop.",
+    "Keep current theme": "Keep current theme",
+    "Do not change your current theme settings.": "Do not change your current theme settings.",
+    "Installing new packages...": "Installing new packages...",
+    "Applying new theme...": "Applying new theme...",
+
+    # New News Widget Slides
+    "Kinexin Decoration": "Kinexin Decoration",
+    "Completely redesigned window decoration for Kinexin Desktop with a modern look and feel is here! Fully customizable and more efficient than ever.": "Completely redesigned window decoration for Kinexin Desktop with a modern look and feel is here! Fully customizable and more efficient than ever.",
+    "Unified User Interface": "Unified User Interface",
+    "Linexin and Kinexin have never been closer. The theme is now unified across the system for GTK-4.0 and GTK-3.0, providing a seamless experience whether you're using Linexin or Kinexin.": "Linexin and Kinexin have never been closer. The theme is now unified across the system for GTK-4.0 and GTK-3.0, providing a seamless experience whether you're using Linexin or Kinexin.",
+    "Advanced Installation Options": "Advanced Installation Options",
+    "Ever wanted to install Linexin but didn't want to include apps like Steam? Now you can! The new installer allows you to choose which components to install, giving you more control over your system setup.": "Ever wanted to install Linexin but didn't want to include apps like Steam? Now you can! The new installer allows you to choose which components to install, giving you more control over your system setup.",
+    "Hello, Linexin!": "Hello, Linexin!",
+    "When you open Linexin Center for the first time, you'll be greeted with a new Linexin Hello widget that introduces you to the world of Linexin. It's designed to be informative and visually appealing, giving you the option to remove or install the widgets prepared for Linexin.": "When you open Linexin Center for the first time, you'll be greeted with a new Linexin Hello widget that introduces you to the world of Linexin. It's designed to be informative and visually appealing, giving you the option to remove or install the widgets prepared for Linexin.",
+    "First Impressions Matter": "First Impressions Matter",
+    "Linexin LiveCD now uses a beautifully themed GRUB bootloader instead of systemd-boot. No more scary text-based boot menu! The new GRUB menu is visually appealing and provides a more user-friendly experience when selecting your boot options.": "Linexin LiveCD now uses a beautifully themed GRUB bootloader instead of systemd-boot. No more scary text-based boot menu! The new GRUB menu is visually appealing and provides a more user-friendly experience when selecting your boot options.",
+
+    # Reboot Prevention
+    "System Update in Progress": "System Update in Progress",
+    "Linexin Updater is currently updating your system. Please wait for the update to finish before restarting.": "Linexin Updater is currently updating your system. Please wait for the update to finish before restarting.",
 }

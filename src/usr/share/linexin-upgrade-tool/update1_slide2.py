@@ -39,8 +39,8 @@ class LinexinCenterStyleWidget(Gtk.Box):
         # Basic widget setup
         self.set_orientation(Gtk.Orientation.VERTICAL)
         self.set_spacing(10)
-        self.set_margin_top(30)
-        self.set_margin_bottom(30) # Standardized
+        self.set_margin_top(20)
+        self.set_margin_bottom(20)
         self.set_margin_start(20)
         self.set_margin_end(20)
         
@@ -49,9 +49,9 @@ class LinexinCenterStyleWidget(Gtk.Box):
         
         # Title
         title = Gtk.Label()
-        title.set_markup('<span size="xx-large" weight="bold">Choose Your Option</span>')
+        title.set_markup(f'<span size="xx-large" weight="bold">{_("Choose Your Option")}</span>')
         title.set_halign(Gtk.Align.CENTER)
-        title.set_margin_bottom(20)
+        title.set_margin_bottom(10)
         self.append(title)
         
         # Get script directory for icons
@@ -62,13 +62,13 @@ class LinexinCenterStyleWidget(Gtk.Box):
             {
                 "name": _("New Linexin Center (Recommended)"),
                 "description": _("Unify your Linexin apps inside one simple app."),
-                "icon": "screen1.png",
+                "icon": "screen1_update1.png",
                 #"details": "Includes gaming launchers, performance tools, and game compatibility layers"
             },
             {
                 "name": _("Separate Apps Icons"),
                 "description": _("Keep my apps as separate icons."),
-                "icon": "screen2.png", 
+                "icon": "screen2_update1.png", 
                 #"details": "Office suite, development tools, media editing, and system utilities"
             }
         ]
@@ -93,7 +93,7 @@ class LinexinCenterStyleWidget(Gtk.Box):
         
         navigation_btns = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=5)
         navigation_btns.set_halign(Gtk.Align.CENTER)
-        navigation_btns.set_margin_top(30)  # Standardized to 30
+        navigation_btns.set_margin_top(15)  # Standardized to 30
 
         # Continue button
         self.continue_btn = Gtk.Button()
@@ -113,7 +113,6 @@ class LinexinCenterStyleWidget(Gtk.Box):
         self.back_btn.set_size_request(200, 50)
         self.back_btn.set_halign(Gtk.Align.CENTER)
         self.back_btn.set_margin_end(10)
-        self.back_btn.connect("clicked", self.on_continue_clicked)
         
         # Add hover effects to continue button
         continue_hover = Gtk.EventControllerMotion()

@@ -7,7 +7,7 @@ update_desktop_visibility() {
         
         if [[ -n "$version_date" ]]; then
             local date_num=$(echo "$version_date" | tr -d '.')
-            local limit_num=20260122
+            local limit_num=20260413
             
             if [[ "$date_num" -gt "$limit_num" ]]; then
                 sed -i 's/^Hidden=.*/Hidden=true/' "$desktop_file"

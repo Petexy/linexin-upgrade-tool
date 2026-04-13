@@ -24,28 +24,28 @@ class WhatsNewWidget(Gtk.Box):
         # --- Carousel Data (Easy to modify) ---
         self.slides = [
             {
-                "title": _("Kinexin Desktop"),
-                "description": _("A meme becomes reality. Kinexin finally exists. It offers a carefully crafted Plasma experience with marvellous glass effects."),
+                "title": _("Kinexin Decoration"),
+                "description": _("Completely redesigned window decoration for Kinexin Desktop with a modern look and feel is here! Fully customizable and more efficient than ever."),
                 "image_path": "1.png"
             },
             {
-                "title": _("Linexin Package Manager"),
-                "description": _("Linpama (Linexin Package Manager) is a new pacman and AUR wrapper written specifically for Linexin. Customize your system with ease!"),
+                "title": _("Unified User Interface"),
+                "description": _("Linexin and Kinexin have never been closer. The theme is now unified across the system for GTK-4.0 and GTK-3.0, providing a seamless experience whether you're using Linexin or Kinexin."),
                 "image_path": "2.png"
             },
             {
-                "title": _("Updated GNOME Extensions"),
-                "description": _("GNOME Extensions are now updated to the latest version. They also have been separated from the system, hence they can update automatically."),
+                "title": _("Advanced Installation Options"),
+                "description": _("Ever wanted to install Linexin but didn't want to include apps like Steam? Now you can! The new installer allows you to choose which components to install, giving you more control over your system setup."),
                 "image_path": "3.png"
             },
             {
-                "title": _("Easier installation"),
-                "description": _("No need to take care of your partitions when installing Linexin. Just select the partition or free space and let the installer do the rest."),
+                "title": _("Hello, Linexin!"),
+                "description": _("When you open Linexin Center for the first time, you'll be greeted with a new Linexin Hello widget that introduces you to the world of Linexin. It's designed to be informative and visually appealing, giving you the option to remove or install the widgets prepared for Linexin."),
                 "image_path": "4.png"
             },
             {
-                "title": _("Affinity 3 (2025) support"),
-                "description": _("Affinity Installer is more powerful than ever. With it you can install Affinity 3 (2025) on your system easily as well as older Affinity products."),
+                "title": _("First Impressions Matter"),
+                "description": _("Linexin LiveCD now uses a beautifully themed GRUB bootloader instead of systemd-boot. No more scary text-based boot menu! The new GRUB menu is visually appealing and provides a more user-friendly experience when selecting your boot options."),
                 "image_path": "5.png"
             }
         ]

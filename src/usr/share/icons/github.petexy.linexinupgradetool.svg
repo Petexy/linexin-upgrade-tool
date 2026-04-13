@@ -10,7 +10,7 @@
    xml:space="preserve"
    inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
    sodipodi:docname="github.petexy.linexinupgradetool.svg"
-   inkscape:export-filename="github.petexy.linexinupgradetool.svg"
+   inkscape:export-filename="github.petexy.linexinupgradetool.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -30,8 +30,8 @@
      inkscape:zoom="0.50000001"
      inkscape:cx="264.99999"
      inkscape:cy="611.99999"
-     inkscape:window-width="2048"
-     inkscape:window-height="1121"
+     inkscape:window-width="2012"
+     inkscape:window-height="1117"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -234,7 +234,7 @@
        x2="134.80624"
        y2="51.511196"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="translate(0,0.52916666)" /></defs><rect
+       gradientTransform="translate(2.6458333,1.0583333)" /></defs><rect
      style="fill:#1d1d20;fill-opacity:1;stroke:none;stroke-width:2.32999995;stroke-linejoin:round;stroke-opacity:1;paint-order:markers stroke fill;stroke-dasharray:none"
      id="rect1"
      width="127.437"
@@ -319,11 +319,11 @@
      y="95.867844" /><text
      xml:space="preserve"
      style="font-style:italic;font-weight:bold;font-size:50.8px;line-height:0;font-family:Poppins;-inkscape-font-specification:'Poppins Bold Italic';writing-mode:lr-tb;direction:ltr;fill:url(#linearGradient4);stroke:none;stroke-width:0.396875;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;paint-order:markers stroke fill"
-     x="27.516666"
-     y="70.379166"
+     x="30.162502"
+     y="70.908333"
      id="text1"><tspan
        sodipodi:role="line"
        id="tspan1"
        style="fill:url(#linearGradient4);fill-opacity:1;stroke:none;stroke-width:0.396875;stroke-opacity:1"
-       x="27.516666"
-       y="70.379166">v2.0</tspan></text></svg>
+       x="30.162502"
+       y="70.908333">v2.1</tspan></text></svg>

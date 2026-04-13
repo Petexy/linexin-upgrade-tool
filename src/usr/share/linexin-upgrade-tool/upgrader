@@ -12,8 +12,10 @@ import shutil
 from welcome_widget import WelcomeWidget
 from simple_localization_manager import get_localization_manager
 from news_widget import WhatsNewWidget
-from de_selection_widget import DEPicker
-from linexin_center_style_picker_widget import LinexinCenterStyleWidget
+from update1_slide1 import InstallDefaultsWidget
+from update1_slide2 import LinexinCenterStyleWidget
+from update2_slide1 import DEPicker
+from update3_slide1 import ThemePicker
 from finish_widget import FinishWidget
 #from custom_widget import CustomWidget
 
@@ -26,6 +28,17 @@ from simple_localization_manager import get_localization_manager, _
 # --- Localization Setup ---
 APP_NAME = "linexin-upgrader"
 
+def get_system_version_id():
+    """Read VERSION_ID from /usr/lib/os-release"""
+    try:
+        with open("/usr/lib/os-release") as f:
+            for line in f:
+                if line.startswith("VERSION_ID="):
+                    return line.split("=", 1)[1].strip().strip('"')
+    except FileNotFoundError:
+        pass
+    return None
+
 class MainWindow(Adw.ApplicationWindow):
     def __init__(self, app):
 
@@ -36,7 +49,8 @@ class MainWindow(Adw.ApplicationWindow):
 
         super().__init__(application=app)
         self.set_title("")
-        self.set_default_size(800, 600)
+        self.set_default_size(800, 700)
+        self.set_size_request(-1, 700)
         self.progress_visible = False
         self.install_started = False
         self.progress_data = ""
@@ -92,14 +106,25 @@ class MainWindow(Adw.ApplicationWindow):
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
         
+        # Detect system version for conditional flow
+        self.version_id = get_system_version_id()
+        self.needs_update1 = self.version_id in ("1.0", "1.0.1")
+        self.needs_update2 = self.version_id in ("1.0", "1.0.1", "1.1", "1.1.1")
+        # 1.0 / 1.0.1 -> update1 slides + update2_slide1 + update3_slide1
+        # 1.1 / 1.1.1 -> update2_slide1 + update3_slide1
+        # 2.0         -> update3_slide1 only
         
-        #Initialize all widgets
+        # Initialize all widgets
         self.welcome_page = WelcomeWidget()
         self.news_page = WhatsNewWidget()
-        self.apps_page = DEPicker()
-        self.linexin_center_page = LinexinCenterStyleWidget()
+        self.update3_slide1_page = ThemePicker()
         self.finish_page = FinishWidget()
-        #self.custom_page = CustomWidget()
+        
+        if self.needs_update2:
+            self.update2_slide1_page = DEPicker()
+        if self.needs_update1:
+            self.update1_slide1_page = InstallDefaultsWidget()
+            self.update1_slide2_page = LinexinCenterStyleWidget()
         
         # --- Main Gtk.Stack to switch between app sections ---
         self.main_stack = Gtk.Stack()
@@ -110,16 +135,28 @@ class MainWindow(Adw.ApplicationWindow):
         self.main_stack.set_valign(Gtk.Align.FILL)
         top_level_box.append(self.main_stack)
 
-        # --- Instantiate all your pages --- 
+        # --- Add pages to stack based on version ---
         self.main_stack.add_named(self.welcome_page, "welcome")
         self.main_stack.add_named(self.news_page, "news")
-        self.main_stack.add_named(self.apps_page, "apps")
+        
+        if self.needs_update1:
+            self.main_stack.add_named(self.update1_slide1_page, "update1_slide1")
+            self.main_stack.add_named(self.update1_slide2_page, "update1_slide2")
+        
+        if self.needs_update2:
+            self.main_stack.add_named(self.update2_slide1_page, "update2_slide1")
+        
+        self.main_stack.add_named(self.update3_slide1_page, "update3_slide1")
         self.main_stack.add_named(self.finish_page, "finish")
-        #self.main_stack.add_named(self.custom_page, "shortname_custom")
 
         # --- Localization ---
         localization_manager = get_localization_manager()
-        for page_name in ["welcome", "news", "apps", "finish"]: 
+        page_names = ["welcome", "news", "update3_slide1", "finish"]
+        if self.needs_update2:
+            page_names.append("update2_slide1")
+        if self.needs_update1:
+            page_names += ["update1_slide1", "update1_slide2"]
+        for page_name in page_names:
             page = self.main_stack.get_child_by_name(page_name)
             if page:
                 localization_manager.register_widget(page)
@@ -130,15 +167,22 @@ class MainWindow(Adw.ApplicationWindow):
         # --- Connect signals ---
         self.welcome_page.btn_install.connect("clicked", self.on_begin_clicked)
         self.news_page.btn_continue.connect("clicked", self.on_news_continue_clicked)
-        self.apps_page.back_btn.connect("clicked", self.on_apps_back_clicked)
-        # Connect signals - NOTE: apps_page continue logic is now handled via callback
-        self.welcome_page.btn_install.connect("clicked", self.on_begin_clicked)
-        self.news_page.btn_continue.connect("clicked", self.on_news_continue_clicked)
-        self.apps_page.back_btn.connect("clicked", self.on_apps_back_clicked)
-        # self.apps_page.continue_btn.connect("clicked", self.on_apps_continue_clicked) <-- REMOVED
         
-        # Determine strict callback hook
-        self.apps_page.on_continue_callback = self.on_apps_continue_clicked
+        # update3 slide signals (ThemePicker uses callback)
+        self.update3_slide1_page.back_btn.connect("clicked", self.on_update3_slide1_back_clicked)
+        self.update3_slide1_page.on_continue_callback = self.on_update3_slide1_continue_clicked
+        
+        if self.needs_update2:
+            # update2 slide signals (DEPicker uses callback)
+            self.update2_slide1_page.back_btn.connect("clicked", self.on_update2_slide1_back_clicked)
+            self.update2_slide1_page.on_continue_callback = self.on_update2_slide1_continue_clicked
+        
+        if self.needs_update1:
+            # update1 slide signals
+            self.update1_slide1_page.back_btn.connect("clicked", self.on_update1_slide1_back_clicked)
+            self.update1_slide1_page.continue_btn.connect("clicked", self.on_update1_slide1_continue_clicked)
+            self.update1_slide2_page.back_btn.connect("clicked", self.on_update1_slide2_back_clicked)
+            self.update1_slide2_page.continue_btn.connect("clicked", self.on_update1_slide2_continue_clicked)
         
         self.finish_page.btn_back.connect("clicked", self.on_back_from_finish_clicked)
         
@@ -172,12 +216,37 @@ class MainWindow(Adw.ApplicationWindow):
         self.main_stack.set_visible_child_name("news")
 
     def on_news_continue_clicked(self, button):
-        self.main_stack.set_visible_child_name("apps")
+        if self.needs_update1:
+            self.main_stack.set_visible_child_name("update1_slide1")
+        elif self.needs_update2:
+            self.main_stack.set_visible_child_name("update2_slide1")
+        else:
+            self.main_stack.set_visible_child_name("update3_slide1")
 
-    def on_apps_back_clicked(self, button):
+    # --- update1 slide navigation (only used for 1.0 / 1.0.1) ---
+    def on_update1_slide1_back_clicked(self, button):
         self.main_stack.set_visible_child_name("news")
 
-    def on_apps_continue_clicked(self, index, option, password=None):
+    def on_update1_slide1_continue_clicked(self, button):
+        self.main_stack.set_visible_child_name("update1_slide2")
+
+    def on_update1_slide2_back_clicked(self, button):
+        self.main_stack.set_visible_child_name("update1_slide1")
+
+    def on_update1_slide2_continue_clicked(self, button):
+        # Apply the user's Linexin Center style choice
+        if self.update1_slide2_page.selected_option == 1:
+            self._show_separate_desktop_files()
+        self.main_stack.set_visible_child_name("update2_slide1")
+
+    # --- update2 slide navigation ---
+    def on_update2_slide1_back_clicked(self, button):
+        if self.needs_update1:
+            self.main_stack.set_visible_child_name("update1_slide2")
+        else:
+            self.main_stack.set_visible_child_name("news")
+
+    def on_update2_slide1_continue_clicked(self, index, option, password=None):
         """
         Handle the continue button click on the Apps/DE Picker page.
         Received via callback from DEPicker.
@@ -192,12 +261,12 @@ class MainWindow(Adw.ApplicationWindow):
             if password:
                 self._start_linexin_installation(password)
             else:
-                self.main_stack.set_visible_child_name("finish")
+                self.main_stack.set_visible_child_name("update3_slide1")
         else:
             # Other logical paths
             self.installing_kinexin = False
             self.finish_page.set_requires_restart(False)
-            self.main_stack.set_visible_child_name("finish")
+            self.main_stack.set_visible_child_name("update3_slide1")
 
     def confirm_installation(self, password):
         """
@@ -246,8 +315,28 @@ class MainWindow(Adw.ApplicationWindow):
                 self._prompt_for_password()
         else:
             # Cancelled or closed
-            self.main_stack.set_visible_child_name("apps")
-            
+            self.main_stack.set_visible_child_name("update2_slide1")
+
+    # --- update3 slide navigation ---
+    def on_update3_slide1_back_clicked(self, button):
+        if self.needs_update2:
+            self.main_stack.set_visible_child_name("update2_slide1")
+        else:
+            self.main_stack.set_visible_child_name("news")
+
+    def on_update3_slide1_continue_clicked(self, index, option, password=None):
+        """Handle continue from ThemePicker. Navigate to finish."""
+        if not self.needs_update2:
+            self.finish_page.set_requires_restart(True)
+
+        # Update version/os-release files and hide desktop entry
+        if password:
+            self._update_os_version_files(password)
+            self._hide_desktop_entry(password)
+            self.finish_page.set_sudo_password(password)
+
+        self.main_stack.set_visible_child_name("finish")
+
     def _start_installation_with_password(self, password):
         """Starts installation immediately with provided password"""
         self.is_installing = True
@@ -323,10 +412,10 @@ class MainWindow(Adw.ApplicationWindow):
                     err_dialog.present()
             else:
                 # Password empty, return to apps
-                self.main_stack.set_visible_child_name("apps")
+                self.main_stack.set_visible_child_name("update2_slide1")
         else:
             # User cancelled password prompt, return to apps
-            self.main_stack.set_visible_child_name("apps")
+            self.main_stack.set_visible_child_name("update2_slide1")
 
         # NOTE: No buttons initially to prevent closing during install
         self.progress_dialog.present()
@@ -391,8 +480,8 @@ class MainWindow(Adw.ApplicationWindow):
         if password:
             self.finish_page.set_sudo_password(password)
         
-        # Switch to the finish page
-        self.main_stack.set_visible_child_name("finish")
+        # Switch to the update3 slide (theme picker) after DE installation
+        self.main_stack.set_visible_child_name("update3_slide1")
 
     def _on_installation_error(self, error_message):
         """Called if installation fails."""
@@ -572,6 +661,26 @@ class MainWindow(Adw.ApplicationWindow):
             # We log but might not want to fail the whole install for this? 
             # Proceeding as it is a post-install step.
 
+    def _show_separate_desktop_files(self):
+        """Show individual app desktop files when user chooses 'Separate Apps Icons'."""
+        bash_script = """
+        for file in github.petexy.linexinupdater.desktop github.petexy.linexin-desktop-presets.desktop github.petexy.affinityinstaller.desktop github.petexy.davinciinstaller.desktop; do
+            filepath="/usr/share/applications/$file"
+            if [ -f "$filepath" ]; then
+                if grep -q "^Hidden=" "$filepath"; then
+                    sed -i 's/^Hidden=.*/Hidden=false/' "$filepath"
+                else
+                    echo "Hidden=false" >> "$filepath"
+                fi
+            fi
+        done
+        """
+        try:
+            subprocess.run(['run0', 'bash', '-c', bash_script],
+                           check=True, capture_output=True, text=True)
+        except Exception as e:
+            print(f"Warning: Failed to show separate desktop files: {e}")
+
     def _hide_desktop_entry(self, password):
         """
         Hides the desktop entry so it's not visible in menus.
@@ -582,8 +691,8 @@ class MainWindow(Adw.ApplicationWindow):
             GLib.idle_add(self._update_progress_status, _("Finalizing..."))
             print("Hiding desktop entry...")
             desktop_file = "/usr/share/applications/github.petexy.linexinupgradetool.desktop"
-            # Use sed to replace Hidden=false with Hidden=true
-            cmd = f"echo '{password}' | sudo -S sed -i 's/Hidden=false/Hidden=true/' '{desktop_file}'"
+            # Use sed to set NoDisplay=true to hide from application menus
+            cmd = f"echo '{password}' | sudo -S sed -i 's/^NoDisplay=false$/NoDisplay=true/' '{desktop_file}'"
             subprocess.run(cmd, shell=True, check=True)
         except Exception as e:
             print(f"Warning: Failed to hide desktop entry: {e}")
@@ -593,7 +702,7 @@ class MainWindow(Adw.ApplicationWindow):
         return os.path.dirname(os.path.abspath(__file__))
 
     def on_back_from_finish_clicked(self, button):
-        self.main_stack.set_visible_child_name("apps")
+        self.main_stack.set_visible_child_name("update3_slide1")
 
     def on_close_request(self, window):
         """

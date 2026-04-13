@@ -103,6 +103,7 @@ translations = {
     "Version": "版本",
     "Exit Installer": "退出安装程序",
     "Kinexin Desktop": "Kinexin 桌面",
+    "A meme becomes reality. Kinexin finally exists. It offers a carefully crafted Plasma experience with marvellous glass effects.": "梅梅变成了现实。Kinexin 终于诞生了。它提供了精心打造的 Plasma 体验，带有绝美的玻璃效果。",
     "Linexin Package Manager": "Linexin 软件包管理器",
     "Linpama (Linexin Package Manager) is a new pacman and AUR wrapper written specifically for Linexin. Customize your system with ease!": "Linpama（Linexin 软件包管理器）是专为 Linexin 编写的全新 pacman 和 AUR 封装工具。轻松定制您的系统！",
     "Updated GNOME Extensions": "更新的 GNOME 扩展",
@@ -112,4 +113,26 @@ translations = {
     "Affinity 3 (2025) support": "Affinity 3 (2025) 支持",
     "Affinity Installer is more powerful than ever. With it you can install Affinity 3 (2025) on your system easily as well as older Affinity products.": "Affinity 安装程序比以往更强大。它可以轻松在系统中安装 Affinity 3 (2025) 以及旧版 Affinity 产品。",
     "Updating system version info...": "正在更新系统版本信息...",
-}
+
+    # ThemePicker (update3_slide1)
+    "Use new Linexin theme": "使用新的 Linexin 主题",
+    "Apply the latest Linexin look and feel to your desktop.": "将最新的 Linexin 外观应用到您的桌面。",
+    "Keep current theme": "保留当前主题",
+    "Do not change your current theme settings.": "不更改当前主题设置。",
+    "Installing new packages...": "正在安装新软件包...",
+    "Applying new theme...": "正在应用新主题...",
+
+    # New News Widget Slides
+    "Kinexin Decoration": "Kinexin 装饰",
+    "Completely redesigned window decoration for Kinexin Desktop with a modern look and feel is here! Fully customizable and more efficient than ever.": "为 Kinexin 桌面全新设计的窗口装饰，带来现代外观，现已上线！完全可定制，效率远超以往。",
+    "Unified User Interface": "统一的用户界面",
+    "Linexin and Kinexin have never been closer. The theme is now unified across the system for GTK-4.0 and GTK-3.0, providing a seamless experience whether you're using Linexin or Kinexin.": "Linexin 与 Kinexin 从未如此接近。主题现已在整个系统中统一支持 GTK-4.0 和 GTK-3.0，无论您使用 Linexin 还是 Kinexin，都能享受无缝体验。",
+    "Advanced Installation Options": "高级安装选项",
+    "Ever wanted to install Linexin but didn't want to include apps like Steam? Now you can! The new installer allows you to choose which components to install, giving you more control over your system setup.": "一直想安装 Linexin，但不想包含 Steam 等应用？现在可以了！新安装程序允许您选择要安装的组件，让您对系统配置拥有更多控制权。",
+    "Hello, Linexin!": "你好，Linexin！",
+    "When you open Linexin Center for the first time, you'll be greeted with a new Linexin Hello widget that introduces you to the world of Linexin. It's designed to be informative and visually appealing, giving you the option to remove or install the widgets prepared for Linexin.": "首次打开 Linexin Center 时，全新的 Linexin Hello 小部件将为您呈现 Linexin 的世界。它被设计为实用且美观，并让您选择刪除或安装为 Linexin 准备的小部件。",
+    "First Impressions Matter": "第一印象很重要",
+    "Linexin LiveCD now uses a beautifully themed GRUB bootloader instead of systemd-boot. No more scary text-based boot menu! The new GRUB menu is visually appealing and provides a more user-friendly experience when selecting your boot options.": "Linexin LiveCD 现在使用瘡丽主题的 GRUB 引导加载程序，而非 systemd-boot。再也不怕文字式启动菜单！新的 GRUB 菜单美观大方，在选择启动选项时提供更友好的体验。",
+    # Reboot Prevention
+    "System Update in Progress": "系统更新正在进行中",
+    "Linexin Updater is currently updating your system. Please wait for the update to finish before restarting.": "Linexin Updater 正在更新您的系统。请等待更新完成后再重新启动。",}

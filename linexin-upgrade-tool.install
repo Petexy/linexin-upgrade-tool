@@ -9,17 +9,17 @@ update_desktop_visibility() {
             local date_num=$(echo "$version_date" | tr -d '.')
             local limit_num=20260413
             
-            if [[ "$date_num" -gt "$limit_num" ]]; then
-                sed -i 's/^Hidden=.*/Hidden=true/' "$desktop_file"
+            if [[ "$date_num" -ge "$limit_num" ]]; then
+                sed -i 's/^NoDisplay=.*/NoDisplay=true/' "$desktop_file"
             else
-                sed -i 's/^Hidden=.*/Hidden=false/' "$desktop_file"
+                sed -i 's/^NoDisplay=.*/NoDisplay=false/' "$desktop_file"
             fi
         fi
     fi
 }
 
 post_install() {
-update_desktop_visibility
+    update_desktop_visibility
 }
 
 post_upgrade() {
